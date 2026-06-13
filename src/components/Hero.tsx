@@ -2,18 +2,20 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Settings, Dumbbell, MapPin, TreePine, Route,
-  UserPlus, Play, Flame, Bike, Footprints, ChevronRight,
+  UserPlus, Play, ChevronRight, ArrowRight,
 } from 'lucide-react'
+import { motion } from 'motion/react'
 import { getProfile, type UserProfile, goalLabels, experienceLabels } from '@/lib/profile'
 import { getExercises } from '@/lib/musclewiki'
 import { buildPreset, PRESETS } from '@/data/preset-programs'
 import { t } from '@/lib/i18n'
-import { ActivityScoreGauge } from './ActivityScoreGauge'
+import { getLifetimeStats } from '@/lib/tracker'
 import { StatsRow } from './StatsRow'
 import { ThemeToggle } from './ThemeToggle'
+import { useMotionVariants } from '@/lib/motion'
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 const STORAGE_KEY = 'gympal-program-custom'
@@ -35,39 +37,38 @@ const goalDayFocus: Record<string, string[]> = {
 }
 
 const experienceDaysMap: Record<string, number> = {
-  beginner: 3,
-  intermediate: 4,
-  advanced: 5,
+  beginner: 3, intermediate: 4, advanced: 5,
 }
-
-type ActivityItem = {
-  id: string
-  label: string
-  duration: string
-  icon: typeof Bike
-  fromColor: string
-  toColor: string
-}
-
-const ACTIVITIES: ActivityItem[] = [
-  { id: 'cycling', label: t.home.activities.cycling, duration: '45 min', icon: Bike, fromColor: '#0f2010', toColor: '#071007' },
-  { id: 'running', label: t.home.activities.running, duration: '30 min', icon: Footprints, fromColor: '#0f1020', toColor: '#070710' },
-  { id: 'strength', label: t.home.activities.strength, duration: '60 min', icon: Dumbbell, fromColor: '#1a0f0f', toColor: '#100707' },
-]
 
 export default function Hero() {
   const router = useRouter()
   const [loadingPreset, setLoadingPreset] = useState<string | null>(null)
+  const [mounted, setMounted] = useState(false)
+  const [profile, setProfile] = useState<UserProfile | null>(null)
+  const [workoutInfo, setWorkoutInfo] = useState({ programName: "Today's Workout", todayFocus: '', daysPerWeek: 3 })
+  const [stats, setStats] = useState({ currentWeightKg: 0, activeDays: 0, streak: 0, weightEntries: [] as { date: string; kg: number }[] })
 
-  const [profile] = useState<UserProfile | null>(() => {
-    if (typeof window === 'undefined') return null
-    return getProfile()
-  })
+  const { fadeUp, staggerContainer } = useMotionVariants()
 
-  const [{ programName, todayFocus, daysPerWeek }] = useState(() => {
-    if (typeof window === 'undefined') return { programName: "Today's Workout", todayFocus: '', daysPerWeek: 3 }
+  useEffect(() => {
+    // SSR-safe: localStorage okuma yalnızca mount sonrası — kasıtlı set-state-in-effect.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true)
     const p = getProfile()
-    if (!p) return { programName: "Today's Workout", todayFocus: '', daysPerWeek: 3 }
+    setProfile(p)
+
+    const lifetimeStats = getLifetimeStats()
+    setStats({
+      currentWeightKg: lifetimeStats.currentWeightKg,
+      activeDays: lifetimeStats.activeDays,
+      streak: lifetimeStats.currentStreak,
+      weightEntries: lifetimeStats.lastSevenDaysWeights,
+    })
+
+    if (!p) {
+      setWorkoutInfo({ programName: "Today's Workout", todayFocus: '', daysPerWeek: 3 })
+      return
+    }
 
     const days = experienceDaysMap[p.experience] || 3
     const todayDayOfWeek = new Date().getDay()
@@ -76,21 +77,21 @@ export default function Hero() {
     try {
       const customRaw = localStorage.getItem(STORAGE_KEY)
       if (customRaw) {
-        const custom = JSON.parse(customRaw)
-        const name = (custom.name || goalProgramNames[p.goal] || 'Your Workout') as string
-        const workoutDays = (custom.daysPerWeek || days) as number
-        const dayData = custom.days?.[todayIdx % workoutDays] as { name?: string } | undefined
-        return { programName: name, todayFocus: dayData?.name || '', daysPerWeek: days }
+        const custom = JSON.parse(customRaw) as { name?: string; daysPerWeek?: number; days?: { name?: string }[] }
+        const name = custom.name || goalProgramNames[p.goal] || 'Your Workout'
+        const workoutDays = custom.daysPerWeek || days
+        const dayData = custom.days?.[todayIdx % workoutDays]
+        setWorkoutInfo({ programName: name, todayFocus: dayData?.name || '', daysPerWeek: days })
+        return
       }
-    } catch {}
+    } catch { /* ignore */ }
 
     const name = goalProgramNames[p.goal] || 'Your Workout'
     const focuses = goalDayFocus[p.goal] || []
     const focus = focuses.length > 0 ? focuses[todayIdx % focuses.length] : ''
-    return { programName: name, todayFocus: focus, daysPerWeek: days }
-  })
+    setWorkoutInfo({ programName: name, todayFocus: focus, daysPerWeek: days })
+  }, [])
 
-  // 0 = Mon … 6 = Sun (JS Sunday = 0 converted to index 6)
   const todayDayOfWeek = new Date().getDay()
   const todayIdx = todayDayOfWeek === 0 ? 6 : todayDayOfWeek - 1
 
@@ -110,282 +111,267 @@ export default function Hero() {
     setLoadingPreset(null)
   }
 
+  const { programName, todayFocus, daysPerWeek } = workoutInfo
+
   return (
-    <section className="relative mx-auto w-full max-w-lg flex-1 px-5 pt-6 pb-4 md:max-w-2xl">
+    <section className="relative mx-auto w-full max-w-lg flex-1 px-5 pt-7 pb-4 md:max-w-2xl">
 
-      {/* ── Section 0: Header with Theme Toggle ── */}
-      <header className="flex items-start justify-between mb-6 animate-fade-in">
+      {/* ── Header ── */}
+      <motion.header
+        variants={fadeUp}
+        initial="hidden"
+        animate="visible"
+        className="flex items-start justify-between mb-7"
+      >
         <div>
-          <p className="text-sm text-muted mb-0.5">{t.home.welcome}</p>
-          <h1 className="text-2xl font-bold tracking-tight">{t.home.greeting}</h1>
-          {profile && (
-            <p className="text-xs text-muted mt-0.5">
-              {experienceLabels[profile.experience]} · {goalLabels[profile.goal]}
-            </p>
-          )}
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] mb-1" style={{ color: 'var(--muted)' }}>
+            GymPal
+          </p>
+          <h1 className="text-4xl font-bold tracking-tight leading-none">{t.home.greeting}</h1>
+          <p className="text-xs mt-2 h-4" style={{ color: 'var(--muted)' }}>
+            {mounted && profile ? `${experienceLabels[profile.experience]} · ${goalLabels[profile.goal]}` : ''}
+          </p>
         </div>
-
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <ThemeToggle />
           <Link
             href="/settings"
             aria-label={t.settings.title}
-            className="tap-scale flex size-10 items-center justify-center rounded-full border border-zinc-800 bg-surface-2 text-muted transition-colors hover:text-foreground"
+            className="flex size-10 items-center justify-center rounded-full border"
+            style={{ borderColor: 'var(--card-border)', background: 'var(--surface-1)', color: 'var(--muted)' }}
           >
             <Settings className="size-4" aria-hidden="true" />
           </Link>
           <Link
             href="/profile"
             aria-label="Open profile"
-            className="tap-scale flex size-10 items-center justify-center rounded-full border border-zinc-800 bg-surface-2 font-bold text-sm text-primary"
+            className="flex size-10 items-center justify-center rounded-full border text-sm font-bold"
+            style={{ borderColor: 'var(--card-border)', background: 'var(--surface-1)', color: 'var(--foreground)' }}
           >
-            {profile
+            {mounted && profile
               ? (experienceLabels[profile.experience]?.[0] ?? 'U')
               : <UserPlus className="size-4" aria-hidden="true" />}
           </Link>
         </div>
-      </header>
+      </motion.header>
 
-      {/* ── Section 1a: Activity Score Gauge (NEW) ── */}
-      <ActivityScoreGauge score={75} streak={5} />
+      <motion.div
+        variants={staggerContainer}
+        initial="hidden"
+        animate="visible"
+        className="flex flex-col gap-8"
+      >
+        {/* ── Today's Plan — flat Swiss card ── */}
+        <motion.div variants={fadeUp}>
+          {!mounted ? (
+            <div className="rounded-3xl border" style={{ minHeight: 196, background: 'var(--surface-1)', borderColor: 'var(--card-border)' }} />
+          ) : profile ? (
+            <WorkoutCard programName={programName} todayFocus={todayFocus} goal={profile.goal} experience={profile.experience} />
+          ) : (
+            <OnboardingCard />
+          )}
+        </motion.div>
 
-      {/* ── Section 1b: Stats Row (NEW) ── */}
-      <StatsRow totalDistance={12.5} totalWeight={850} activeDays={4} />
+        {/* ── Stats Row — 3 real cards ── */}
+        <motion.div variants={fadeUp}>
+          <StatsRow
+            currentWeightKg={stats.currentWeightKg}
+            activeDays={stats.activeDays}
+            streak={stats.streak}
+            weightEntries={stats.weightEntries}
+          />
+        </motion.div>
 
-      {/* ── Section 2: Training Plan + Day Pills ── */}
-      <div className="mb-5 animate-fade-in-up">
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500">{t.home.trainingPlan}</span>
-          <Link href="/program" className="text-xs text-primary hover:underline transition-colors">
-            {t.common.seeAll} →
-          </Link>
-        </div>
+        {/* ── Training Plan day pills ── */}
+        <motion.div variants={fadeUp}>
+          <SectionLabel label={t.home.trainingPlan} href="/program" linkText={t.common.seeAll} />
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide -mx-1 px-1">
+            {DAYS.map((day, i) => {
+              const isToday = i === todayIdx
+              const isWorkoutDay = mounted && profile ? i < daysPerWeek : false
+              return (
+                <Link
+                  key={day}
+                  href="/program"
+                  aria-label={`${day}${isWorkoutDay ? ', workout' : ', rest'}${isToday ? ', today' : ''}`}
+                  className={`flex min-w-[42px] flex-1 flex-col items-center gap-1.5 rounded-2xl py-3 ${isToday ? 'btn-ink' : ''}`}
+                  style={isToday ? undefined : {
+                    background: isWorkoutDay ? 'var(--surface-1)' : 'transparent',
+                    border: `1px solid ${isWorkoutDay ? 'var(--card-border)' : 'transparent'}`,
+                    color: isWorkoutDay ? 'var(--foreground)' : 'var(--muted)',
+                  }}
+                >
+                  <span className="text-[10px] font-medium">{day}</span>
+                  <div
+                    className="size-1.5 rounded-full"
+                    style={{ background: isWorkoutDay ? (isToday ? 'var(--ink-text)' : 'var(--foreground)') : 'transparent' }}
+                  />
+                </Link>
+              )
+            })}
+          </div>
+        </motion.div>
 
-        <div className="flex gap-2 overflow-x-auto scrollbar-hide -mx-1 px-1">
-          {DAYS.map((day, i) => {
-            const isToday = i === todayIdx
-            const isWorkoutDay = profile ? i < daysPerWeek : false
-            return (
-              <Link
-                key={day}
-                href="/program"
-                aria-label={`${day}${isWorkoutDay ? ', workout' : ', rest'}${isToday ? ', today' : ''}`}
-                className={`tap-scale flex min-w-[42px] flex-1 flex-col items-center gap-1.5 rounded-2xl py-3 transition-colors ${
-                  isToday
-                    ? 'bg-primary text-black'
-                    : isWorkoutDay
-                    ? 'border border-primary/25 bg-surface-2 text-primary'
-                    : 'border border-zinc-800/50 bg-surface-1 text-zinc-600'
-                }`}
+        {/* ── Quick Programs ── */}
+        <motion.div variants={fadeUp}>
+          <SectionLabel label={t.home.quickPrograms} />
+          <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-1 px-1 pb-1">
+            {PRESETS.map((preset, i) => (
+              <motion.button
+                key={preset.id}
+                type="button"
+                disabled={loadingPreset !== null}
+                onClick={() => startPreset(preset.id)}
+                whileTap={{ scale: 0.97 }}
+                className="shrink-0 w-[180px] text-left rounded-2xl p-4 transition-colors disabled:opacity-50"
+                style={{ background: 'var(--surface-1)', border: '1px solid var(--card-border)' }}
               >
-                <span className={`text-[10px] font-medium ${isToday ? 'text-black/60' : ''}`}>{day}</span>
-                <div
-                  className={`size-1.5 rounded-full ${
-                    isWorkoutDay ? (isToday ? 'bg-black/30' : 'bg-primary') : 'bg-transparent'
-                  }`}
-                />
-              </Link>
-            )
-          })}
-        </div>
-      </div>
-
-      {/* ── Section 3: Workout Card ── */}
-      {profile ? (
-        <WorkoutCard
-          programName={programName}
-          todayFocus={todayFocus}
-          goal={profile.goal}
-          experience={profile.experience}
-        />
-      ) : (
-        <OnboardingCard />
-      )}
-
-      {/* ── Section 4: Quick Programs ── */}
-      <div className="mt-7 animate-fade-in-up">
-        <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-3 block">{t.home.quickPrograms}</span>
-        <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-1 px-1 pb-1">
-          {PRESETS.map((preset) => (
-            <button
-              key={preset.id}
-              type="button"
-              disabled={loadingPreset !== null}
-              onClick={() => startPreset(preset.id)}
-              className="tap-scale shrink-0 w-[180px] text-left rounded-2xl border border-zinc-800 bg-surface-1 p-4 transition-colors hover:border-primary/40 hover:bg-surface-2 disabled:opacity-50"
-            >
-              <div className="flex items-center justify-between mb-3">
-                <span className="inline-flex items-center rounded-full bg-primary-dim px-2.5 py-1 text-[11px] font-medium text-primary">
-                  {preset.tag}
-                </span>
-                {loadingPreset === preset.id
-                  ? <span className="size-4 rounded-full border-2 border-primary border-t-transparent animate-spin" aria-label={t.common.loading} />
-                  : <Play className="size-4 text-zinc-500" aria-hidden="true" />}
-              </div>
-              <p className="font-semibold text-sm text-foreground">{preset.name}</p>
-              <p className="text-xs text-zinc-500 mt-0.5">{preset.description}</p>
-              <p className="text-[11px] text-zinc-600 mt-2">{preset.durationLabel}</p>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* ── Section 5: My Activity ── */}
-      <div className="mt-7 animate-fade-in-up">
-        <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-3 block">{t.home.myActivity}</span>
-        <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-1 px-1 pb-1">
-          {ACTIVITIES.map((a) => {
-            const Icon = a.icon
-            return (
-              <div
-                key={a.id}
-                style={{ background: `linear-gradient(135deg, ${a.fromColor} 0%, ${a.toColor} 100%)` }}
-                className="tap-scale shrink-0 min-w-[140px] h-[92px] rounded-2xl border border-zinc-800/40 p-3.5 flex flex-col justify-between"
-              >
-                <span className="flex size-8 items-center justify-center rounded-lg bg-black/30 text-primary">
-                  <Icon className="size-4" aria-hidden="true" />
-                </span>
-                <div>
-                  <p className="text-xs font-semibold text-foreground">{a.label}</p>
-                  <p className="text-[11px] text-zinc-500">{a.duration}</p>
+                <div className="flex items-center justify-between mb-5">
+                  <span className="text-base font-bold tabular" style={{ color: 'var(--foreground)' }}>0{i + 1}</span>
+                  {loadingPreset === preset.id
+                    ? <span className="size-4 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'var(--foreground)', borderTopColor: 'transparent' }} aria-label={t.common.loading} />
+                    : <Play className="size-4" style={{ color: 'var(--muted)' }} aria-hidden="true" />}
                 </div>
-              </div>
-            )
-          })}
-        </div>
-      </div>
+                <p className="font-semibold text-sm" style={{ color: 'var(--foreground)' }}>{preset.name}</p>
+                <p className="text-xs mt-0.5" style={{ color: 'var(--muted)' }}>{preset.description}</p>
+                <p className="text-[11px] mt-2" style={{ color: 'var(--muted)' }}>{preset.durationLabel}</p>
+              </motion.button>
+            ))}
+          </div>
+        </motion.div>
 
-      {/* ── Explore quick grid ── */}
-      <div className="mt-7 animate-fade-in-up">
-        <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-3 block">{t.home.explore}</span>
-        <div className="grid grid-cols-3 gap-3">
-          {[
-            { href: '/gyms', icon: MapPin, title: 'Gyms', desc: 'Near you' },
-            { href: '/parks', icon: TreePine, title: 'Parks', desc: 'Outdoor' },
-            { href: '/routes', icon: Route, title: 'Routes', desc: 'Cycling' },
-          ].map((f) => {
-            const Icon = f.icon
-            return (
-              <Link
-                key={f.href}
-                href={f.href}
-                className="tap-scale group flex flex-col gap-3 rounded-2xl border border-zinc-800 bg-surface-1 p-4 transition-colors hover:border-primary/40 hover:bg-surface-2"
-              >
-                <span className="flex size-10 items-center justify-center rounded-xl bg-primary-dim text-primary transition-colors group-hover:bg-primary-mid">
-                  <Icon className="size-5" aria-hidden="true" />
-                </span>
-                <span>
-                  <span className="block text-sm font-semibold text-foreground">{f.title}</span>
-                  <span className="block text-xs text-zinc-500">{f.desc}</span>
-                </span>
-              </Link>
-            )
-          })}
-        </div>
-      </div>
+        {/* ── Explore ── */}
+        <motion.div variants={fadeUp}>
+          <SectionLabel label={t.home.explore} />
+          <div className="grid grid-cols-3 gap-3">
+            {[
+              { href: '/gyms',   icon: MapPin,   title: 'Gyms',   desc: 'Near you' },
+              { href: '/parks',  icon: TreePine, title: 'Parks',  desc: 'Outdoor'  },
+              { href: '/routes', icon: Route,    title: 'Routes', desc: 'Cycling'  },
+            ].map((f) => {
+              const Icon = f.icon
+              return (
+                <motion.div key={f.href} whileHover={{ y: -2 }} whileTap={{ scale: 0.97 }}>
+                  <Link
+                    href={f.href}
+                    className="group flex flex-col gap-4 rounded-2xl p-4"
+                    style={{ background: 'var(--surface-1)', border: '1px solid var(--card-border)' }}
+                  >
+                    <Icon className="size-5" style={{ color: 'var(--foreground)' }} aria-hidden="true" />
+                    <span>
+                      <span className="block text-sm font-semibold" style={{ color: 'var(--foreground)' }}>{f.title}</span>
+                      <span className="block text-xs" style={{ color: 'var(--muted)' }}>{f.desc}</span>
+                    </span>
+                  </Link>
+                </motion.div>
+              )
+            })}
+          </div>
+        </motion.div>
+      </motion.div>
 
     </section>
   )
 }
 
-function WorkoutCard({
-  programName,
-  todayFocus,
-  goal,
-  experience,
-}: {
-  programName: string
-  todayFocus: string
-  goal: string
-  experience: string
+/* ─── Section label ───────────────────────────────────────── */
+
+function SectionLabel({ label, href, linkText }: { label: string; href?: string; linkText?: string }) {
+  return (
+    <div className="flex items-center justify-between mb-3">
+      <span className="text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: 'var(--muted)' }}>
+        {label}
+      </span>
+      {href && linkText && (
+        <Link href={href} className="inline-flex items-center gap-1 text-xs hover:underline" style={{ color: 'var(--foreground)' }}>
+          {linkText} <ArrowRight className="size-3" aria-hidden="true" />
+        </Link>
+      )}
+    </div>
+  )
+}
+
+/* ─── WorkoutCard ─────────────────────────────────────────── */
+
+function WorkoutCard({ programName, todayFocus, goal, experience }: {
+  programName: string; todayFocus: string; goal: string; experience: string
 }) {
   const goalTag = (goalLabels as Record<string, string>)[goal] || 'Fitness'
   const expTag = (experienceLabels as Record<string, string>)[experience] || 'Beginner'
 
   return (
-    <Link
-      href="/program"
-      className="tap-scale block overflow-hidden rounded-3xl border border-primary/20 p-5 shadow-[0_0_40px_rgba(57,255,20,0.07)] animate-fade-in-up"
-      style={{ background: 'linear-gradient(135deg, #0d1f0d 0%, #0a0a0a 100%)' }}
-    >
-      <p className="text-xs text-zinc-500 mb-3">{t.home.todaysPlan}</p>
-
-      <div className="flex items-start justify-between gap-3 mb-4">
-        <div className="min-w-0 flex-1">
-          <h2 className="text-xl font-bold leading-tight truncate">
-            {todayFocus || programName}
-          </h2>
-          {todayFocus && (
-            <p className="text-sm text-zinc-400 mt-0.5">{programName}</p>
-          )}
-          <div className="flex items-center gap-2 mt-3">
-            <span className="inline-flex items-center gap-1 rounded-full bg-surface-3 px-2.5 py-1 text-[11px] font-medium text-zinc-300">
-              <Flame className="size-3 text-primary" aria-hidden="true" />
-              {goalTag}
-            </span>
-            <span className="inline-flex items-center gap-1 rounded-full bg-surface-3 px-2.5 py-1 text-[11px] font-medium text-zinc-300">
-              {expTag}
-            </span>
+    <motion.div whileTap={{ scale: 0.99 }}>
+      <Link
+        href="/program"
+        className="block rounded-3xl p-6"
+        style={{ background: 'var(--surface-1)', border: '1px solid var(--card-border)' }}
+      >
+        <div className="flex items-start justify-between gap-3 mb-6">
+          <div className="min-w-0 flex-1">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] mb-2" style={{ color: 'var(--muted)' }}>
+              {t.home.todaysPlan}
+            </p>
+            <h2 className="text-2xl font-bold leading-tight tracking-tight truncate">
+              {todayFocus || programName}
+            </h2>
+            {todayFocus && (
+              <p className="text-sm mt-1" style={{ color: 'var(--muted)' }}>{programName}</p>
+            )}
+          </div>
+          <div className="text-right shrink-0">
+            <p className="text-3xl font-bold tabular leading-none">0<span className="text-base font-normal" style={{ color: 'var(--muted)' }}>%</span></p>
+            <p className="text-[10px] mt-1" style={{ color: 'var(--muted)' }}>done</p>
           </div>
         </div>
-        <ProgressRing percent={0} />
-      </div>
 
-      <div className="flex items-center justify-center gap-2 rounded-2xl bg-primary py-3.5 text-sm font-bold text-black">
-        <Play className="size-4 fill-black" aria-hidden="true" />
-        {t.home.continueWorkout}
-      </div>
-    </Link>
+        <div className="flex items-center gap-2 mb-6">
+          <Tag>{goalTag}</Tag>
+          <Tag>{expTag}</Tag>
+        </div>
+
+        <motion.div
+          whileHover={{ scale: 1.01 }}
+          className="btn-ink flex items-center justify-center gap-2 rounded-2xl py-3.5 text-sm font-bold"
+        >
+          <Play className="size-4" style={{ fill: 'var(--ink-text)' }} aria-hidden="true" />
+          {t.home.continueWorkout}
+        </motion.div>
+      </Link>
+    </motion.div>
   )
 }
+
+function Tag({ children }: { children: React.ReactNode }) {
+  return (
+    <span
+      className="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-medium"
+      style={{ background: 'var(--surface-2)', color: 'var(--muted)', border: '1px solid var(--card-border)' }}
+    >
+      {children}
+    </span>
+  )
+}
+
+/* ─── OnboardingCard ──────────────────────────────────────── */
 
 function OnboardingCard() {
   return (
-    <div
-      className="rounded-3xl border border-zinc-800 p-5 animate-fade-in-up"
-      style={{ background: 'linear-gradient(135deg, #141414 0%, #0a0a0a 100%)' }}
-    >
-      <div className="flex size-12 items-center justify-center rounded-2xl bg-primary-dim mb-4">
-        <Dumbbell className="size-6 text-primary" aria-hidden="true" />
+    <div className="rounded-3xl p-6" style={{ background: 'var(--surface-1)', border: '1px solid var(--card-border)' }}>
+      <div className="flex size-12 items-center justify-center rounded-2xl mb-4" style={{ background: 'var(--surface-2)' }}>
+        <Dumbbell className="size-6" style={{ color: 'var(--foreground)' }} aria-hidden="true" />
       </div>
-      <h2 className="text-xl font-bold mb-1.5">{t.home.onboardingTitle}</h2>
-      <p className="text-sm text-zinc-500 mb-5">{t.home.onboardingDesc}</p>
-      <Link
-        href="/profile/edit"
-        className="tap-scale flex items-center justify-center gap-2 rounded-2xl bg-primary py-3.5 text-sm font-bold text-black"
-      >
-        <UserPlus className="size-4" aria-hidden="true" />
-        {t.home.createProfile}
-        <ChevronRight className="size-4" aria-hidden="true" />
-      </Link>
-    </div>
-  )
-}
-
-const RING_RADIUS = 26
-const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS
-
-function ProgressRing({ percent }: { percent: number }) {
-  const offset = RING_CIRCUMFERENCE - (percent / 100) * RING_CIRCUMFERENCE
-  return (
-    <div className="relative shrink-0" aria-hidden="true">
-      <svg width="64" height="64" viewBox="0 0 64 64" className="-rotate-90">
-        <circle cx="32" cy="32" r={RING_RADIUS} fill="none" stroke="#27272a" strokeWidth="5" />
-        <circle
-          cx="32"
-          cy="32"
-          r={RING_RADIUS}
-          fill="none"
-          stroke="var(--primary)"
-          strokeWidth="5"
-          strokeLinecap="round"
-          strokeDasharray={RING_CIRCUMFERENCE}
-          strokeDashoffset={offset}
-        />
-      </svg>
-      <span className="absolute inset-0 flex items-center justify-center text-sm font-bold">
-        {percent}%
-      </span>
+      <h2 className="text-2xl font-bold tracking-tight mb-1.5">{t.home.onboardingTitle}</h2>
+      <p className="text-sm mb-6" style={{ color: 'var(--muted)' }}>{t.home.onboardingDesc}</p>
+      <motion.div whileTap={{ scale: 0.98 }} whileHover={{ scale: 1.01 }}>
+        <Link
+          href="/profile/edit"
+          className="btn-ink flex items-center justify-center gap-2 rounded-2xl py-3.5 text-sm font-bold"
+        >
+          <UserPlus className="size-4" aria-hidden="true" />
+          {t.home.createProfile}
+          <ChevronRight className="size-4" aria-hidden="true" />
+        </Link>
+      </motion.div>
     </div>
   )
 }
