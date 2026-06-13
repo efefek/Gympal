@@ -200,3 +200,46 @@ export function logVital(
 export function getVitals(): HealthVital[] {
   return [...vitalStore.get()].sort((a, b) => a.date.localeCompare(b.date))
 }
+
+/* ─── Lifetime Stats (Home dashboard) ───────────────────── */
+
+export interface LifetimeStats {
+  totalWeightKg: number
+  /** Most recent logged body weight (kg), 0 when no entries. */
+  currentWeightKg: number
+  activeDays: number
+  currentStreak: number
+  lastSevenDaysWeights: { date: string; kg: number }[]
+}
+
+export function getLifetimeStats(): LifetimeStats {
+  const weights = getWeightLog()
+  const totalWeightKg = weights.reduce((sum, e) => sum + e.kg, 0)
+  const currentWeightKg = weights.length > 0 ? weights[weights.length - 1].kg : 0
+
+  const measurements = getMeasurements()
+  const activeDates = new Set([
+    ...weights.map((e) => e.date),
+    ...measurements.map((e) => e.date),
+  ])
+  const activeDays = activeDates.size
+
+  const sortedDates = [...activeDates].sort()
+  let currentStreak = 0
+  const today = todayKey()
+  let cursor = today
+  while (activeDates.has(cursor)) {
+    currentStreak++
+    const d = new Date(cursor)
+    d.setDate(d.getDate() - 1)
+    cursor = todayKey(d)
+  }
+
+  const lastSevenDaysWeights = weights
+    .slice(-7)
+    .map((e) => ({ date: e.date, kg: e.kg }))
+
+  void sortedDates
+
+  return { totalWeightKg, currentWeightKg, activeDays, currentStreak, lastSevenDaysWeights }
+}
