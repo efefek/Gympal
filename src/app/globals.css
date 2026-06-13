@@ -1,49 +1,66 @@
 @import "tailwindcss";
 
 @layer theme {
+  /* ── Monokrom Swiss tasarım sistemi ──
+     Dark = kök, Light = [data-theme="light"].
+     Primary aksiyon = mürekkep-ters (.btn-ink): dark'ta beyaz buton/siyah yazı,
+     light'ta siyah buton/beyaz yazı. Accent (--accent) sadece nadir tek vurgu.
+     Eski --primary* token'ları geriye-uyum için --ink/--accent'e alias'landı
+     (neon yeşil tamamen kaldırıldı; in-scope ekranlar .btn-ink kullanır). */
   :root {
-    --background: #000000;
-    --foreground: #e4e4e7;
-    --muted: #a1a1aa;
-    --muted-bg: #18181b;
-    --card-bg: #09090b;
-    --card-border: #27272a;
-    --primary: #39ff14;
-    --primary-dark: #2ccc0e;
-    --primary-dim: rgba(57, 255, 20, 0.08);
-    --primary-mid: rgba(57, 255, 20, 0.25);
-    --primary-glow: 0 0 30px rgba(57, 255, 20, 0.25);
+    --background: #0a0a0b;
+    --foreground: #f4f4f5;
+    --muted: #8a8a90;
+    --muted-bg: #1c1c1f;
+    --card-bg: #141416;
+    --card-border: #26262a;
 
-    /* Surface katmanları — kart derinliği için */
-    --surface-1: #0a0a0a;
-    --surface-2: #141414;
-    --surface-3: #1c1c1c;
+    /* Surface katmanları — düz, glow yok */
+    --surface-1: #141416;
+    --surface-2: #1c1c1f;
+    --surface-3: #242428;
 
-    /* Radius token'ları */
-    --radius-card: 1.5rem;
+    /* Mürekkep-ters primary aksiyon */
+    --ink: #f4f4f5;
+    --ink-text: #0a0a0b;
+
+    /* Tek accent — çok nadir kullanılır (today-dot / streak) */
+    --accent: #ff5c00;
+
+    /* Legacy alias'lar (yeşil değil; eski bg-primary/text-primary kırılmasın) */
+    --primary: var(--accent);
+    --primary-dark: #e04e00;
+    --primary-dim: rgba(140, 140, 150, 0.12);
+    --primary-mid: rgba(255, 92, 0, 0.22);
+    --primary-glow: none;
+
+    /* Radius token'ları — concentric */
+    --r-outer: 1.5rem;
+    --r-inner: 1rem;
+    --radius-card: var(--r-outer);
     --radius-pill: 9999px;
 
-    /* Yeni accent renkler */
-    --accent-blue: #3b82f6;
-    --accent-amber: #f59e0b;
-    --accent-rose: #f43f5e;
     --text-primary: var(--foreground);
     --text-muted: var(--muted);
     --border: var(--card-border);
   }
 
-  /* Light tema */
+  /* Light tema — mono düz/flat */
   [data-theme="light"] {
-    --background: #fafafa;
-    --foreground: #18181b;
-    --muted: #71717a;
-    --muted-bg: #f4f4f5;
+    --background: #fafaf8;
+    --foreground: #16161a;
+    --muted: #6e6e73;
+    --muted-bg: #f3f2ee;
     --card-bg: #ffffff;
-    --card-border: #e4e4e7;
-    --surface-1: #f9f9f9;
-    --surface-2: #f4f4f5;
-    --surface-3: #eeeeef;
-    /* primary/accent korunur */
+    --card-border: #e6e4df;
+    --surface-1: #ffffff;
+    --surface-2: #f3f2ee;
+    --surface-3: #eae8e2;
+
+    --ink: #16161a;
+    --ink-text: #fafaf8;
+
+    --primary-dim: rgba(20, 20, 20, 0.06);
   }
 }
 
@@ -61,13 +78,28 @@
   --color-surface-1: var(--surface-1);
   --color-surface-2: var(--surface-2);
   --color-surface-3: var(--surface-3);
+  --color-ink: var(--ink);
+  --color-ink-text: var(--ink-text);
+  --color-accent: var(--accent);
+  --color-border: var(--card-border);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+}
+
+/* Mürekkep-ters primary aksiyon — tüm ana CTA'lar bunu kullanır */
+.btn-ink {
+  background: var(--ink);
+  color: var(--ink-text);
 }
 
 * {
   scrollbar-width: thin;
   scrollbar-color: #27272a transparent;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
@@ -77,9 +109,22 @@ body {
   overflow-x: hidden;
 }
 
-@keyframes glow-pulse {
-  0%, 100% { box-shadow: 0 0 8px rgba(57, 255, 20, 0.15); }
-  50% { box-shadow: 0 0 20px rgba(57, 255, 20, 0.3); }
+h1, h2, h3 { text-wrap: balance; }
+p, li { text-wrap: pretty; }
+
+.tabular { font-variant-numeric: tabular-nums; }
+
+img {
+  outline: 1px solid rgba(255,255,255,0.05);
+  outline-offset: -1px;
+}
+
+/* Glass utility — düz yüzey, hafif blur (heavy saturate yok) */
+.glass {
+  background: color-mix(in srgb, var(--background) 88%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--card-border);
 }
 
 @keyframes fade-in-up {
@@ -95,10 +140,6 @@ body {
 @keyframes fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
-}
-
-.animate-glow-pulse {
-  animation: glow-pulse 3s ease-in-out infinite;
 }
 
 .animate-fade-in-up {
@@ -191,7 +232,7 @@ body {
 }
 
 .skeleton {
-  background: linear-gradient(90deg, #141414 25%, #1c1c1c 50%, #141414 75%);
+  background: linear-gradient(90deg, var(--surface-1) 25%, var(--surface-2) 50%, var(--surface-1) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
