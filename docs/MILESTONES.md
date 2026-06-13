@@ -9,6 +9,7 @@
 | M4 — Quality & Accessibility | 🔄 In Progress | — |
 | M5 — Mobil UI Yeniden Tasarım | ✅ Done | — |
 | M7 — Companion App | ✅ Done | — |
+| M9 — Native Motion (Home + Body) | ✅ Done | — |
 | M6 — APK Paketleme (Capacitor) | ⏳ Planlandı | — |
 | M8 — AI Video (LTX/WAN) Deneyi | 💡 Fikir | — |
 
