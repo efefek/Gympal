@@ -24,6 +24,9 @@
 .DS_Store
 *.pem
 
+# exercise video pipeline workspace (local-only, see scripts/VIDEO_PIPELINE.md)
+/.video-work/
+
 # debug
 npm-debug.log*
 yarn-debug.log*

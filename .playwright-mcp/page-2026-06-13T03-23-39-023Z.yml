@@ -1,0 +1,165 @@
+- generic [active] [ref=e1]:
+  - link "Skip to content" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - navigation [ref=e3]:
+    - generic [ref=e4]:
+      - link "GymPal home" [ref=e5] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e6]:
+          - img [ref=e7]
+          - generic [ref=e13]: GymPal
+      - generic [ref=e14]:
+        - link "Program" [ref=e15] [cursor=pointer]:
+          - /url: /program
+          - img [ref=e16]
+          - text: Program
+        - link "Gyms" [ref=e18] [cursor=pointer]:
+          - /url: /gyms
+          - img [ref=e19]
+          - text: Gyms
+        - link "Parks" [ref=e22] [cursor=pointer]:
+          - /url: /parks
+          - img [ref=e23]
+          - text: Parks
+        - link "Routes" [ref=e25] [cursor=pointer]:
+          - /url: /routes
+          - img [ref=e26]
+          - text: Routes
+        - link "Profile" [ref=e30] [cursor=pointer]:
+          - /url: /profile
+          - img [ref=e31]
+          - text: Profile
+        - link "Settings" [ref=e34] [cursor=pointer]:
+          - /url: /settings
+          - img [ref=e35]
+  - main [ref=e38]:
+    - generic [ref=e39]:
+      - generic [ref=e40]:
+        - heading "My Dashboard" [level=1] [ref=e41]
+        - link "Settings" [ref=e42] [cursor=pointer]:
+          - /url: /settings
+          - img [ref=e43]
+      - link "Create your profile to unlock health tracking." [ref=e46] [cursor=pointer]:
+        - /url: /profile/edit
+        - img [ref=e48]
+        - generic [ref=e51]: Create your profile to unlock health tracking.
+      - generic [ref=e52]:
+        - generic [ref=e53]:
+          - text: Mood
+          - paragraph [ref=e54]: How do you feel today?
+          - generic [ref=e55]:
+            - button "Awful" [ref=e56]:
+              - img [ref=e57]
+            - button "Bad" [ref=e61]:
+              - img [ref=e62]
+            - button "Okay" [ref=e66]:
+              - img [ref=e67]
+            - button "Good" [ref=e70]:
+              - img [ref=e71]
+            - button "Great" [ref=e75]:
+              - img [ref=e76]
+        - generic [ref=e80]:
+          - generic [ref=e82]: Daily Checklist
+          - list
+          - generic [ref=e83]:
+            - generic [ref=e84]: New habit...
+            - textbox "New habit..." [ref=e85]
+            - button "Add" [ref=e86]:
+              - img [ref=e87]
+      - generic [ref=e88]:
+        - generic [ref=e89]:
+          - text: To-Do
+          - list
+          - generic [ref=e90]:
+            - generic [ref=e91]: New task...
+            - textbox "New task..." [ref=e92]
+            - button "Add" [ref=e93]:
+              - img [ref=e94]
+        - generic [ref=e95]:
+          - text: Shopping List
+          - list
+          - generic [ref=e96]:
+            - generic [ref=e97]: Add item...
+            - textbox "Add item..." [ref=e98]
+            - button "Add" [ref=e99]:
+              - img [ref=e100]
+      - generic [ref=e102]:
+        - text: Meal Plan
+        - generic [ref=e103]:
+          - button "Mon" [pressed] [ref=e104]
+          - button "Tue" [ref=e105]
+          - button "Wed" [ref=e106]
+          - button "Thu" [ref=e107]
+          - button "Fri" [ref=e108]
+          - button "Sat" [ref=e109]
+          - button "Sun" [ref=e110]
+        - generic [ref=e111]:
+          - generic [ref=e112]:
+            - generic [ref=e113]: Breakfast
+            - textbox "Breakfast" [ref=e114]:
+              - /placeholder: What will you eat?
+          - generic [ref=e115]:
+            - generic [ref=e116]: Lunch
+            - textbox "Lunch" [ref=e117]:
+              - /placeholder: What will you eat?
+          - generic [ref=e118]:
+            - generic [ref=e119]: Dinner
+            - textbox "Dinner" [ref=e120]:
+              - /placeholder: What will you eat?
+          - generic [ref=e121]:
+            - generic [ref=e122]: Snack
+            - textbox "Snack" [ref=e123]:
+              - /placeholder: What will you eat?
+      - generic [ref=e124]:
+        - generic [ref=e125]:
+          - generic [ref=e126]: Calendar
+          - generic [ref=e127]:
+            - button "Previous month" [ref=e128]:
+              - img [ref=e129]
+            - generic [ref=e131]: June 2026
+            - button "Next month" [ref=e132]:
+              - img [ref=e133]
+        - generic [ref=e135]:
+          - generic [ref=e136]: M
+          - generic [ref=e137]: T
+          - generic [ref=e138]: W
+          - generic [ref=e139]: T
+          - generic [ref=e140]: F
+          - generic [ref=e141]: S
+          - generic [ref=e142]: S
+        - generic [ref=e143]:
+          - generic [ref=e145]: "1"
+          - generic [ref=e147]: "2"
+          - generic [ref=e149]: "3"
+          - generic [ref=e151]: "4"
+          - generic [ref=e153]: "5"
+          - generic [ref=e155]: "6"
+          - generic [ref=e157]: "7"
+          - generic [ref=e159]: "8"
+          - generic [ref=e161]: "9"
+          - generic [ref=e163]: "10"
+          - generic [ref=e165]: "11"
+          - generic [ref=e167]: "12"
+          - generic [ref=e169]: "13"
+          - generic [ref=e171]: "14"
+          - generic [ref=e173]: "15"
+          - generic [ref=e175]: "16"
+          - generic [ref=e177]: "17"
+          - generic [ref=e179]: "18"
+          - generic [ref=e181]: "19"
+          - generic [ref=e183]: "20"
+          - generic [ref=e185]: "21"
+          - generic [ref=e187]: "22"
+          - generic [ref=e189]: "23"
+          - generic [ref=e191]: "24"
+          - generic [ref=e193]: "25"
+          - generic [ref=e195]: "26"
+          - generic [ref=e197]: "27"
+          - generic [ref=e199]: "28"
+          - generic [ref=e201]: "29"
+          - generic [ref=e203]: "30"
+        - generic [ref=e204]:
+          - generic [ref=e205]: Mood logged
+          - generic [ref=e207]: Checklist done
+  - button "Open Next.js Dev Tools" [ref=e214] [cursor=pointer]:
+    - img [ref=e215]
