@@ -176,3 +176,101 @@ Tüm iş iki paralel Sonnet 4.6 alt-ajanına bölünerek yürütüldü (çakış
 - Veri repository pattern arkasında soyutlandı — ileride Supabase senkron katmanı consumer'lara dokunmadan eklenebilir.
 - `NEXT_PUBLIC_EXERCISE_VIDEO_BASE` env'i set edilince tüm egzersiz görselleri otomatik video'ya geçer, fallback GIF.
 - Sonraki adım: video batch'i abinin 4090 makinesinde koşmak + M6 Capacitor APK.
+
+---
+
+## 2026-06-13 — Session 9 (Motion Temeli — Bölüm 0)
+
+**Hedef:** Home + Body "native kalite" motion yeniden inşasının temeli: shared motion sistemi + primitifler.
+
+**What was done:**
+- **`src/lib/motion.ts`** — `motionTokens` (duration/ease/distance/spring) + `useMotionVariants()` hook (fadeUp, scaleIn, staggerContainer, sheetVariants) — hepsi `useReducedMotion` fallback'li.
+- **`src/app/template.tsx`** — App Router page transition: her route'da `motion.div` fade+slide (reduced-motion guard'lı).
+- **`src/components/ui/AnimatedNumber.tsx`** — `useMotionValue` + `useSpring` ile 0'dan sayan animated counter, `.tabular` font-variant.
+- **`src/components/ui/ProgressRing.tsx`** — SVG spring-animasyonlu dairesel progress ring (vitals + workout).
+- **`src/components/ui/Sheet.tsx`** — `vaul` Drawer sarmalayıcı, themalı glass bottom sheet (drag handle, a11y vaul'dan gelir).
+- **`globals.css`** — polish: `html { -webkit-font-smoothing }`, `h1-h3 text-wrap: balance`, `p/li text-wrap: pretty`, `.tabular`, `.glass` utility (backdrop-blur + border), `--r-outer/--r-inner` concentric radius token'ları, `img { outline }` kenar hissi.
+- **`src/lib/tracker.ts`** — `getLifetimeStats()` helper: totalWeightKg, activeDays, currentStreak, lastSevenDaysWeights.
+- **`src/components/BottomNav.tsx`** — `.glass` nav, motion `layoutId="bottomnav-indicator"` spring spring aktif sekme göstergesi (tap-scale kaldırıldı).
+
+**Doğrulama:** `build` yeşil · `test` 72/72 · TypeScript clean.
+
+**Notes:**
+- react-body-highlighter kurulmadı (React 19 peer uyarısı riski) — Bölüm 2'de gerekirse basit SVG siluet fallback.
+- Sonraki adım: Bölüm 1 — Hero.tsx yeniden inşası (stagger, featured kart, StatsRow + vaul sheet).
+
+---
+
+## 2026-06-13 — Session 10 (Bölüm 1 — Hero Yeniden İnşa)
+
+**Hedef:** Home ekranını motion stagger + interaktif StatsRow + featured workout kartı ile native-app kalitesine çıkarmak.
+
+**What was done:**
+- **`Hero.tsx` komple yeniden yazıldı:**
+  - `ActivityScoreGauge` kullanımı kaldırıldı (dosya korundu), `ProgressRing` bileşeni import edildi.
+  - `useMotionVariants()` ile `staggerContainer + fadeUp` — tüm bölümler 0.06s aralıklı stagger ile sahneye giriyor.
+  - `useEffect` ile mount sonrası `getLifetimeStats()` okunuyor (hydration guard).
+  - `WorkoutCard` `whileTap scale 0.98` + Start CTA `whileHover scale 1.02`.
+  - Explore grid kartları `whileHover y -2` lift.
+  - Quick Programs `whileTap + whileHover` feedback.
+  - Tüm renkler CSS değişkenlerine taşındı (Tailwind class yerine `style={{ color: 'var(...)' }}`).
+- **`StatsRow.tsx` yeniden yazıldı:**
+  - Her kart `motion.button` + `whileTap scale 0.95` — tıklanabilir.
+  - `AnimatedNumber` ile 0'dan sayan değerler, `.tabular` font-variant.
+  - Tıklamada `vaul` Sheet açılıyor (DistanceSheet / WeightSheet / ActiveSheet).
+  - `getLifetimeStats()` verisi: totalWeightKg, activeDays, streak, weightEntries.
+- **`src/components/home/StatSheet.tsx` (yeni):**
+  - `DistanceSheet`: mock 7 günlük km verisi + recharts `BarChart`.
+  - `WeightSheet`: tracker weight log + recharts `LineChart` trend.
+  - `ActiveSheet`: haftalık / aylık aktif gün + streak bilgisi.
+  - `useStatSheet()` hook — hangi sheet açık state'ini yönetir.
+
+**Doğrulama:** `build` yeşil · `test` 72/72 · TypeScript clean.
+
+**Notes:**
+- ease tipi `[number, number, number, number]` tuple olarak tanımlandı (motion/react `Easing` tipi bunu gerektirir).
+- recharts Tooltip `formatter` parametresi `ValueType` kabul ediyor, explicit `number` tip cast kaldırıldı.
+- Sonraki adım: Bölüm 2 — Body yeniden inşası (SVG siluet, MeasurementSheet, MetricChart, VitalsGrid).
+
+---
+
+## 2026-06-13 — Session 10 (Body Sayfası Yeniden İnşası — Bölüm 2)
+
+**Hedef:** Body sayfasını "Log Measurements düz buton" düzeyinden interaktif, native-hissli dashboard'a çıkarmak.
+
+**What was done:**
+- **`src/components/body/BodyCharacter.tsx`** — SVG vücut silueti (react-body-highlighter yerine; React 19 uyumu). 4 bölge (chest/arms/waist/legs) tıklanabilir, ölçümü girilmiş bölgeler primary yeşille dolup kalkıyor. `motion.path` whileTap scale feedback.
+- **`src/components/body/MeasurementSheet.tsx`** — vaul tabanlı form sheet: Weight/Height/Arm/Waist/Chest/Body Fat alanları, `logMeasurement()` ile kayıt, ilk ölçüm detection (confetti hook için).
+- **`src/components/body/MetricChart.tsx`** — recharts LineChart ile ölçüm trendi. 1W/1M/3M/1Y range tab'ları. Kilo/Bel/Kol filtre çipleri. Animated çizgi, themalı tooltip.
+- **`src/components/body/VitalsGrid.tsx`** — 4 vital kartı (Su/Protein/Adım/Kalp). Her kartda `ProgressRing` + `AnimatedNumber` (0'dan sayar).
+- **`src/app/body/page.tsx`** — Komple yeniden yazıldı: `staggerContainer`/`fadeUp` motion stagger, BodyCharacter + 5 stat (weight/height/bmi/waist/arm), MetricChart, VitalsGrid, sticky "Log Measurements" CTA (motion whileTap).
+
+**Doğrulama:** `build` yeşil · `test` 72/72 geçti · TypeScript clean.
+
+**Notes:**
+- SVG siluet fallback seçildi (react-body-highlighter React 19 peer uyumsuzluğu riski). Bölgeler `filledRegions` prop'u ile highlight; tıklanınca sheet açılıyor.
+- M9 milestone ✅ Done olarak işaretlendi.
+
+---
+
+## 2026-06-13 — Session 11 (Swiss Monokrom Yeniden Tasarım — Home + Body)
+
+**Hedef:** Önceki pasın görsel sonucu kötüydü (neon yeşil/siyah şablon hissi, sahte veri, Body'de üst üste binen yazılar + BMI 495.9 + "yeşil leke" karakter). Kullanıcı kararları: Playwright ile görerek iterasyon; Swiss/International monokrom tema (dark + light, gradient/glow/neon yok, primary = mürekkep-ters buton); Body'de karakter yok → ölçüm listesi; Companion'a dokunma.
+
+**What was done:**
+- **Tasarım sistemi** (`globals.css`) — neon-yeşil/gradient/glow token'ları kaldırıldı, monokrom Swiss sistemine geçildi: `--ink`/`--ink-text` (mürekkep-ters primary), `--accent` (tek nadir vurgu, #FF5C00), düz `--surface` katmanları. Eski `--primary*` → `--ink`/`--accent` alias'landı (37 dosya tek dosyada yeşilden çıktı). `.btn-ink` utility. `.glass` sadeleşti, `glow-pulse` silindi.
+- **Home** (`Hero.tsx`) — Swiss editorial: dev tipografik header, düz "Today's Plan" kartı (gradient/glow yok, `.btn-ink` CTA, "0%" mono sayı), numaralı 01/02/03 stat kartları. **Sahte Distance kaldırıldı** → gerçek 3 stat: Streak / Active / Weight (son girdi). Mono day pills (today = ink-ters). "My Activity" yeşil-gradient bölümü silindi. Zıplama fix: mount öncesi sabit-yükseklik skeleton.
+- **StatsRow + StatSheet** — `MOCK_DISTANCE`/`DistanceSheet` silindi; Streak/Active/Weight sheet'leri gerçek veriyle; grafikler mono (`--foreground`).
+- **tracker.ts** — `getLifetimeStats`'a `currentWeightKg` (son girdi) eklendi; anlamsız `totalWeightKg` toplamı Home'dan düşürüldü.
+- **Body** (`body/page.tsx`) — **karakter silindi**; temiz ölçüm listesi (Weight/Height/Waist/Arm/Chest/Body Fat — satır + dev mono değer + birim + ok). Satıra tap → o alana **odaklı** sheet. **BMI sanity bound** (weight 20–400, height 50–250 dışı → "—"); mevcut `calcBMI` yeniden kullanıldı. Sticky `.btn-ink` CTA.
+- **MeasurementSheet** — `focusField` prop (autoFocus) + input validasyonu (aralık dışı reddedilir, accent renkli hata). 495.9 saçmalığı bitti.
+- **MetricChart / VitalsGrid / ProgressRing / BottomNav / Sheet** — mono restyle (ink/accent, yeşil glow kaldırıldı). `BodyCharacter.tsx` silindi.
+
+**Playwright self-review (390px):** Home dark/light + Body dark/light ekran görüntüleriyle doğrulandı — üst üste binme yok, taşma yok, yeşil kalıntı yok. Body'ye 75kg/180cm girildi → **BMI 23.1 · Normal** (doğru), liste temiz doldu, trend grafiği çizdi, odaklı sheet açıldı.
+
+**Doğrulama:** `lint` 0 hata (7 önceden var olan uyarı) · `test` 72/72 · `build` yeşil.
+
+**Notes:**
+- Companion bu pasta kod olarak korundu; tema token'ları değişince mono'ya döndü (kullanıcı içeriği beğenmişti).
+- `--accent` tek satırda değiştirilebilir; canlı gösterilip onaya açık.
+- Sonraki adım: kullanıcı geri bildirimine göre ince ayar; sonra Social/Program aynı Swiss dile.
