@@ -274,3 +274,25 @@ Tüm iş iki paralel Sonnet 4.6 alt-ajanına bölünerek yürütüldü (çakış
 - Companion bu pasta kod olarak korundu; tema token'ları değişince mono'ya döndü (kullanıcı içeriği beğenmişti).
 - `--accent` tek satırda değiştirilebilir; canlı gösterilip onaya açık.
 - Sonraki adım: kullanıcı geri bildirimine göre ince ayar; sonra Social/Program aynı Swiss dile.
+
+---
+
+## 2026-06-13 — Session 12 (Pas 1 Devam — Profile + Body Tamamlama)
+
+**Hedef:** Pas 1 Swiss monokrom kararlarını Dashboard, Profile Edit ve Body veri girişlerine taşımak; 390px dark/light Playwright doğrulaması yapmak.
+
+**What was done:**
+- **Global tema:** `--accent` hardal sarısı `#C99700` yapıldı; ana CTA'lar ink-ters kaldı. Skip-link mono ve sadece `:focus-visible` görünür hale getirildi. Mobilde tema toggle tüm ekranlarda erişilebilir.
+- **Dashboard `/profile`:** Header ve kart dili mono Swiss'e çekildi; dashboard bölgeleri kalın ayrı bloklara dönüştü. Dark/light input okunurluğu düzeltildi, mobil sağlık satırı taşma yapmaması için tek kolona alındı.
+- **`/profile/edit`:** Form yeniden düzenlendi; mevcut profil doğrudan düzenlenebilir, experience-level aktif seçim bug'ı düzeldi. Diet adımı eklendi: dietary preferences, dislikes, allergens, daily water/protein targets.
+- **Body:** Leg/thigh ölçümü eklendi. Measurement sheet son ölçüm/vital değerleriyle prefill ediyor. Water/protein/food intake aynı sheet'ten giriliyor. `logMeasurement` ve `logVital` merge-safe yapıldı; undefined alanlar mevcut kaydı ezmiyor.
+- **Sheet layering:** Vaul sheet z-index'i BottomNav/FAB üstüne alındı.
+- **Testler:** `tracker.test` merge-safe measurement/vital ve thigh coverage ile genişletildi; profile migration testi diyet default'larını kapsıyor.
+
+**Playwright self-review (390px):** `/profile`, `/profile/edit`, profile diet step, `/body`, body measurement sheet dark+light screenshotlarla kontrol edildi. Inputlar light/dark okunur; Body sheet son girdiyle doluyor; theme toggle görünür; footer/nav ve sheet/FAB çakışmaları düzeltildi.
+
+**Doğrulama:** `lint` 0 hata (7 mevcut uyarı) · `test` 75/75 · `build` yeşil.
+
+**Notes:**
+- `pas1-backlog.md` repo, `.claude` ve Codex memory registry içinde bulunamadı; bu session kapsamı kullanıcı mesajındaki Pas 1 maddelerine göre uygulandı.
+- Social + Companion kapsam dışı bırakıldı; sonraki pasa kaldı.
