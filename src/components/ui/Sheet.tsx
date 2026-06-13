@@ -19,9 +19,9 @@ export function Sheet({ open, onOpenChange, title, children, snapPoints, initial
       activeSnapPoint={snapPoints && initialSnap !== undefined ? snapPoints[initialSnap] : undefined}
     >
       <Drawer.Portal>
-        <Drawer.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40" />
+        <Drawer.Overlay className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm" />
         <Drawer.Content
-          className="fixed bottom-0 left-0 right-0 z-50 flex flex-col rounded-t-2xl"
+          className="fixed bottom-0 left-0 right-0 z-[70] flex flex-col rounded-t-2xl"
           style={{ background: 'var(--surface-2)', border: '1px solid var(--card-border)', borderBottom: 'none', maxHeight: '90dvh' }}
           aria-label={title}
         >

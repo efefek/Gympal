@@ -25,13 +25,13 @@
     --ink-text: #0a0a0b;
 
     /* Tek accent — çok nadir kullanılır (today-dot / streak) */
-    --accent: #ff5c00;
+    --accent: #c99700;
 
     /* Legacy alias'lar (yeşil değil; eski bg-primary/text-primary kırılmasın) */
     --primary: var(--accent);
-    --primary-dark: #e04e00;
+    --primary-dark: #a77e00;
     --primary-dim: rgba(140, 140, 150, 0.12);
-    --primary-mid: rgba(255, 92, 0, 0.22);
+    --primary-mid: rgba(201, 151, 0, 0.22);
     --primary-glow: none;
 
     /* Radius token'ları — concentric */
@@ -89,6 +89,61 @@
 /* Mürekkep-ters primary aksiyon — tüm ana CTA'lar bunu kullanır */
 .btn-ink {
   background: var(--ink);
+  color: var(--ink-text);
+}
+
+.theme-control {
+  border: 1px solid var(--card-border);
+  background: color-mix(in srgb, var(--background) 88%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.dashboard-region {
+  background: var(--surface-1);
+  border: 3px solid var(--foreground);
+  border-radius: 0;
+}
+
+.dashboard-region + .dashboard-region {
+  margin-top: 1rem;
+}
+
+.ui-field {
+  width: 100%;
+  border: 1px solid var(--card-border);
+  background: var(--surface-2);
+  color: var(--foreground);
+  border-radius: 0.75rem;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  outline: none;
+}
+
+[data-theme="light"] .ui-field {
+  background: #ffffff;
+  color: #16161a;
+}
+
+.ui-field::placeholder {
+  color: var(--muted);
+}
+
+.ui-field:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.ui-choice {
+  border: 1px solid var(--card-border);
+  background: var(--surface-2);
+  color: var(--foreground);
+}
+
+.ui-choice[data-active="true"] {
+  background: var(--ink);
+  border-color: var(--ink);
   color: var(--ink-text);
 }
 
@@ -213,14 +268,17 @@ img {
   left: -9999px;
   z-index: 9999;
   padding: 0.5rem 1rem;
-  background: var(--primary);
-  color: #000;
-  font-weight: 600;
-  border-radius: 0 0 0.5rem 0;
+  background: var(--ink);
+  color: var(--ink-text);
+  font-family: var(--font-geist-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  border-radius: 0;
   text-decoration: none;
 }
 
-.skip-link:focus {
+.skip-link:focus-visible {
   top: 0;
   left: 0;
 }

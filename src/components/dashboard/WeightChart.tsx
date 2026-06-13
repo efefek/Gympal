@@ -28,7 +28,7 @@ function Sparkline({ entries }: { entries: WeightEntry[] }) {
       <polyline
         points={points.join(' ')}
         fill="none"
-        stroke="var(--primary)"
+        stroke="var(--foreground)"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -56,18 +56,18 @@ export default function WeightChart() {
   const latest = entries.length > 0 ? entries[entries.length - 1].kg : null
 
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-surface-1 p-4">
+    <div className="border-[3px] p-4" style={{ background: 'var(--surface-1)', borderColor: 'var(--foreground)' }}>
       <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500">{t.dashboard.weight.title}</span>
+        <span className="font-mono text-xs font-bold uppercase tracking-[0.18em]" style={{ color: 'var(--muted)' }}>{t.dashboard.weight.title}</span>
         {mounted && latest !== null && (
-          <span className="text-sm font-bold text-foreground tabular-nums">{latest} {t.dashboard.weight.kg}</span>
+          <span className="font-mono text-sm font-bold text-foreground tabular-nums">{latest} {t.dashboard.weight.kg}</span>
         )}
       </div>
 
       {mounted && entries.length >= 2 ? (
         <Sparkline entries={entries} />
       ) : (
-        <p className="text-xs text-zinc-600 mt-3">{t.dashboard.weight.empty}</p>
+        <p className="mt-3 text-xs" style={{ color: 'var(--muted)' }}>{t.dashboard.weight.empty}</p>
       )}
 
       <div className="flex gap-2 mt-3">
@@ -80,13 +80,14 @@ export default function WeightChart() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
-          className="flex-1 rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-foreground placeholder-zinc-600 outline-none focus:border-primary/50"
+          className="flex-1 border px-3 py-2 text-sm outline-none"
+          style={{ background: 'var(--surface-2)', borderColor: 'var(--card-border)', color: 'var(--foreground)' }}
         />
         <button
           type="button"
           aria-label={t.dashboard.weight.logWeight}
           onClick={handleAdd}
-          className="tap-scale flex size-9 items-center justify-center rounded-xl bg-primary text-black"
+          className="btn-ink tap-scale flex size-9 items-center justify-center"
         >
           <Plus className="size-4" aria-hidden="true" />
         </button>

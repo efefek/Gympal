@@ -45,15 +45,15 @@ export default function MiniCalendar() {
   }
 
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-surface-1 p-4">
+    <div className="border-[3px] p-4" style={{ background: 'var(--surface-1)', borderColor: 'var(--foreground)' }}>
       <div className="flex items-center justify-between mb-3">
-        <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500">{t.dashboard.calendar.title}</span>
+        <span className="font-mono text-xs font-bold uppercase tracking-[0.18em]" style={{ color: 'var(--muted)' }}>{t.dashboard.calendar.title}</span>
         <div className="flex items-center gap-2">
-          <button type="button" aria-label="Previous month" onClick={() => shift(-1)} className="text-zinc-500 hover:text-zinc-300">
+          <button type="button" aria-label="Previous month" onClick={() => shift(-1)} style={{ color: 'var(--muted)' }}>
             <ChevronLeft className="size-4" aria-hidden="true" />
           </button>
-          <span className="text-xs font-medium text-zinc-400 min-w-[88px] text-center">{monthLabel}</span>
-          <button type="button" aria-label="Next month" onClick={() => shift(1)} className="text-zinc-500 hover:text-zinc-300">
+          <span className="min-w-[88px] text-center font-mono text-xs font-bold" style={{ color: 'var(--foreground)' }}>{monthLabel}</span>
+          <button type="button" aria-label="Next month" onClick={() => shift(1)} style={{ color: 'var(--muted)' }}>
             <ChevronRight className="size-4" aria-hidden="true" />
           </button>
         </div>
@@ -61,7 +61,7 @@ export default function MiniCalendar() {
 
       <div className="grid grid-cols-7 gap-1 mb-1">
         {WEEKDAYS.map((d, i) => (
-          <div key={i} className="text-center text-[10px] font-medium text-zinc-600">{d}</div>
+          <div key={i} className="text-center font-mono text-[10px] font-bold" style={{ color: 'var(--muted)' }}>{d}</div>
         ))}
       </div>
 
@@ -76,13 +76,14 @@ export default function MiniCalendar() {
             <div
               key={day}
               className={`flex flex-col items-center justify-center aspect-square rounded-lg text-xs ${
-                isToday ? 'bg-primary-dim text-primary font-bold' : 'text-zinc-400'
+                isToday ? 'btn-ink font-bold' : ''
               }`}
+              style={{ color: isToday ? undefined : 'var(--muted)' }}
             >
               <span>{day}</span>
               <div className="flex gap-0.5 mt-0.5 h-1">
-                {marks.mood && <span className="size-1 rounded-full bg-sky-400" aria-hidden="true" />}
-                {marks.checklist && <span className="size-1 rounded-full bg-yellow-400" aria-hidden="true" />}
+                {marks.mood && <span className="size-1 rounded-full" style={{ background: 'var(--foreground)' }} aria-hidden="true" />}
+                {marks.checklist && <span className="size-1 rounded-full" style={{ background: 'var(--accent)' }} aria-hidden="true" />}
               </div>
             </div>
           )
@@ -90,9 +91,9 @@ export default function MiniCalendar() {
       </div>
 
       {/* Legend */}
-      <div className="flex items-center gap-3 mt-3 text-[10px] text-zinc-600">
-        <span className="flex items-center gap-1"><span className="size-1.5 rounded-full bg-sky-400" />{t.dashboard.calendar.legendMood}</span>
-        <span className="flex items-center gap-1"><span className="size-1.5 rounded-full bg-yellow-400" />{t.dashboard.calendar.legendChecklist}</span>
+      <div className="mt-3 flex items-center gap-3 text-[10px]" style={{ color: 'var(--muted)' }}>
+        <span className="flex items-center gap-1"><span className="size-1.5 rounded-full" style={{ background: 'var(--foreground)' }} />{t.dashboard.calendar.legendMood}</span>
+        <span className="flex items-center gap-1"><span className="size-1.5 rounded-full" style={{ background: 'var(--accent)' }} />{t.dashboard.calendar.legendChecklist}</span>
       </div>
     </div>
   )

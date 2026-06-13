@@ -28,9 +28,11 @@ export default function BodyPage() {
   const profile = mounted ? getProfile() : null
   const today = todayKey()
   const todayMeasurement = measurements.find((m) => m.date === today)
+  const latestMeasurement = measurements.at(-1)
+  const currentMeasurement = todayMeasurement ?? latestMeasurement
 
-  const weight = todayMeasurement?.weight ?? profile?.weight
-  const height = todayMeasurement?.height ?? profile?.height
+  const weight = currentMeasurement?.weight ?? profile?.weight
+  const height = currentMeasurement?.height ?? profile?.height
   const bmiValid =
     weight != null && height != null &&
     weight >= HUMAN.weightMin && weight <= HUMAN.weightMax &&
@@ -40,10 +42,11 @@ export default function BodyPage() {
   const rows: { field: MeasureField; label: string; value?: number; unit: string; decimals?: number }[] = [
     { field: 'weight', label: 'Weight', value: weight, unit: 'kg', decimals: 1 },
     { field: 'height', label: 'Height', value: height, unit: 'cm' },
-    { field: 'waist', label: 'Waist', value: todayMeasurement?.waistCirc, unit: 'cm' },
-    { field: 'arm', label: 'Arm', value: todayMeasurement?.armCirc, unit: 'cm' },
-    { field: 'chest', label: 'Chest', value: todayMeasurement?.chest, unit: 'cm' },
-    { field: 'bodyFat', label: 'Body Fat', value: todayMeasurement?.bodyFat, unit: '%' },
+    { field: 'waist', label: 'Waist', value: currentMeasurement?.waistCirc, unit: 'cm' },
+    { field: 'arm', label: 'Arm', value: currentMeasurement?.armCirc, unit: 'cm' },
+    { field: 'thigh', label: 'Leg / Thigh', value: currentMeasurement?.thighCirc, unit: 'cm' },
+    { field: 'chest', label: 'Chest', value: currentMeasurement?.chest, unit: 'cm' },
+    { field: 'bodyFat', label: 'Body Fat', value: currentMeasurement?.bodyFat, unit: '%' },
   ]
 
   function openSheet(field?: MeasureField) {
@@ -69,7 +72,7 @@ export default function BodyPage() {
           <h1 className="text-4xl font-bold tracking-tight leading-none">Body</h1>
         </div>
         {bmi != null && (
-          <div className="text-right">
+          <div className="mr-12 text-right">
             <p className="text-3xl font-bold tabular leading-none">{bmi.toFixed(1)}</p>
             <p className="text-[11px] mt-1 capitalize" style={{ color: 'var(--muted)' }}>BMI · {bmiCategory(bmi)}</p>
           </div>
@@ -115,7 +118,11 @@ export default function BodyPage() {
       {/* Vitals */}
       <motion.div variants={fadeUp} className="mb-6">
         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] mb-3" style={{ color: 'var(--muted)' }}>Vitals</p>
-        <VitalsGrid vitals={vitals} />
+        <VitalsGrid
+          vitals={vitals}
+          waterGoal={profile?.dailyWaterMlTarget}
+          proteinGoal={profile?.dailyProteinGTarget}
+        />
       </motion.div>
 
       {/* Sticky CTA */}

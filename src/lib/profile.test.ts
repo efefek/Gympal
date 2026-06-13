@@ -224,7 +224,14 @@ describe('profile localStorage functions', () => {
   it('saveProfile then getProfile round-trips correctly', () => {
     saveProfile(sampleProfile)
     const loaded = getProfile()
-    expect(loaded).toEqual(sampleProfile)
+    expect(loaded).toMatchObject(sampleProfile)
+    expect(loaded).toMatchObject({
+      dietaryPreferences: '',
+      foodDislikes: '',
+      allergens: '',
+      dailyWaterMlTarget: 2500,
+      dailyProteinGTarget: 150,
+    })
   })
 
   it('clearProfile removes the saved profile', () => {

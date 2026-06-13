@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import BottomNav from "@/components/BottomNav";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { ThemeProvider } from "next-themes";
 
 const geistSans = Geist({
@@ -41,6 +42,9 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col antialiased">
         <ThemeProvider attribute="data-theme" defaultTheme="dark" enableSystem={false}>
           <a href="#main-content" className="skip-link">Skip to content</a>
+          <div className="theme-control fixed right-4 top-4 z-50 rounded-xl md:hidden">
+            <ThemeToggle />
+          </div>
           <Navbar />
           <main id="main-content" className="flex-1 flex flex-col pb-safe-nav md:pb-0">{children}</main>
           <BottomNav />
