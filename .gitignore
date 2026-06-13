@@ -42,3 +42,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# playwright mcp self-review artifacts (local-only)
+/.playwright-mcp/
+/test-*.png
+/*-dark.png
+/*-light.png
