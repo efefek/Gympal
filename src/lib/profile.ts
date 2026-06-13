@@ -25,16 +25,29 @@ export interface UserProfile {
   experience: Experience
   equipment: EquipmentType[]
   location: WorkoutLocation
+  dietaryPreferences?: string
+  foodDislikes?: string
+  allergens?: string
+  dailyWaterMlTarget?: number
+  dailyProteinGTarget?: number
 }
 
 const STORAGE_KEY = 'gympal-profile'
+
+const DEFAULT_NUTRITION = {
+  dietaryPreferences: '',
+  foodDislikes: '',
+  allergens: '',
+  dailyWaterMlTarget: 2500,
+  dailyProteinGTarget: 150,
+}
 
 export function getProfile(): UserProfile | null {
   if (typeof window === 'undefined') return null
   const raw = localStorage.getItem(STORAGE_KEY)
   if (!raw) return null
   try {
-    return JSON.parse(raw) as UserProfile
+    return { ...DEFAULT_NUTRITION, ...(JSON.parse(raw) as UserProfile) }
   } catch {
     return null
   }

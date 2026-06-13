@@ -27,8 +27,8 @@ export default function MealPlanner() {
   }
 
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-surface-1 p-4">
-      <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500">{t.dashboard.meals.title}</span>
+    <div className="border-[3px] p-4" style={{ background: 'var(--surface-1)', borderColor: 'var(--foreground)' }}>
+      <span className="font-mono text-xs font-bold uppercase tracking-[0.18em]" style={{ color: 'var(--muted)' }}>{t.dashboard.meals.title}</span>
 
       {/* Day selector */}
       <div className="flex gap-1.5 overflow-x-auto scrollbar-hide -mx-1 px-1 mt-3 mb-3">
@@ -39,8 +39,9 @@ export default function MealPlanner() {
             aria-pressed={activeDay === i}
             onClick={() => setActiveDay(i)}
             className={`tap-scale shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
-              activeDay === i ? 'bg-primary text-black' : 'bg-surface-2 text-zinc-400'
+              activeDay === i ? 'btn-ink' : 'bg-surface-2'
             }`}
+            style={{ color: activeDay === i ? undefined : 'var(--muted)' }}
           >
             {label}
           </button>
@@ -51,7 +52,7 @@ export default function MealPlanner() {
       <div className="space-y-2">
         {MEAL_SLOTS.map((slot) => (
           <div key={slot}>
-            <label htmlFor={`meal-${activeDay}-${slot}`} className="block text-[11px] font-medium text-zinc-500 mb-1">
+            <label htmlFor={`meal-${activeDay}-${slot}`} className="mb-1 block font-mono text-[11px] font-bold uppercase tracking-[0.14em]" style={{ color: 'var(--muted)' }}>
               {SLOT_LABEL[slot]}
             </label>
             <input
@@ -60,7 +61,8 @@ export default function MealPlanner() {
               placeholder={t.dashboard.meals.placeholder}
               value={mounted ? valueFor(activeDay, slot) : ''}
               onChange={(e) => handleChange(activeDay, slot, e.target.value)}
-              className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-foreground placeholder-zinc-600 outline-none focus:border-primary/50"
+              className="w-full border px-3 py-2 text-sm outline-none"
+              style={{ background: 'var(--surface-2)', borderColor: 'var(--card-border)', color: 'var(--foreground)' }}
             />
           </div>
         ))}

@@ -11,10 +11,10 @@ const CATEGORY_LABEL: Record<string, string> = {
 }
 
 const CATEGORY_COLOR: Record<string, string> = {
-  underweight: '#38bdf8',
-  normal: 'var(--primary)',
-  overweight: '#facc15',
-  obese: '#f87171',
+  underweight: 'var(--foreground)',
+  normal: 'var(--accent)',
+  overweight: 'var(--accent)',
+  obese: 'var(--foreground)',
 }
 
 // BMI gauge spans 15–40 across a 180° arc.
@@ -38,8 +38,8 @@ export default function BmiCard({ height, weight }: BmiCardProps) {
   const dashOffset = CIRC * (1 - ratio)
 
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-surface-1 p-4">
-      <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500">{t.dashboard.bmi.title}</span>
+    <div className="border-[3px] p-4" style={{ background: 'var(--surface-1)', borderColor: 'var(--foreground)' }}>
+      <span className="font-mono text-xs font-bold uppercase tracking-[0.18em]" style={{ color: 'var(--muted)' }}>{t.dashboard.bmi.title}</span>
 
       <div className="flex flex-col items-center mt-2">
         <div className="relative" style={{ width: 160, height: 88 }}>
@@ -47,7 +47,7 @@ export default function BmiCard({ height, weight }: BmiCardProps) {
             <path
               d={`M 10 80 A ${RADIUS} ${RADIUS} 0 0 1 150 80`}
               fill="none"
-              stroke="#27272a"
+              stroke="var(--surface-3)"
               strokeWidth="10"
               strokeLinecap="round"
             />
@@ -62,7 +62,7 @@ export default function BmiCard({ height, weight }: BmiCardProps) {
             />
           </svg>
           <div className="absolute inset-x-0 bottom-0 flex flex-col items-center">
-            <span className="text-2xl font-black tabular-nums" style={{ color }}>{bmi.toFixed(1)}</span>
+            <span className="font-mono text-2xl font-black tabular-nums" style={{ color }}>{bmi.toFixed(1)}</span>
           </div>
         </div>
         <span className="text-xs font-medium mt-1" style={{ color }}>{CATEGORY_LABEL[category] ?? category}</span>

@@ -58,6 +58,7 @@ export interface BodyMeasurement {
   weight?: number
   height?: number
   armCirc?: number
+  thighCirc?: number
   waistCirc?: number
   bodyFat?: number
   chest?: number
@@ -71,6 +72,7 @@ export interface HealthVital {
   bloodPressureDia?: number
   waterMl?: number
   proteinG?: number
+  foodKcal?: number
   steps?: number
 }
 
@@ -173,9 +175,10 @@ export function logMeasurement(
 ): BodyMeasurement[] {
   const entries = measurementStore.get()
   const existing = entries.find((e) => e.date === date)
+  const definedMeasurement = omitUndefined({ ...measurement, date })
   const next = existing
-    ? measurementStore.update(existing.id, measurement)
-    : measurementStore.add({ id: generateId(), ...measurement, date })
+    ? measurementStore.update(existing.id, definedMeasurement)
+    : measurementStore.add({ id: generateId(), ...definedMeasurement })
   return [...next].sort((a, b) => a.date.localeCompare(b.date))
 }
 
@@ -191,9 +194,10 @@ export function logVital(
 ): HealthVital[] {
   const entries = vitalStore.get()
   const existing = entries.find((e) => e.date === date)
+  const definedVital = omitUndefined({ ...vital, date })
   const next = existing
-    ? vitalStore.update(existing.id, vital)
-    : vitalStore.add({ id: generateId(), ...vital, date })
+    ? vitalStore.update(existing.id, definedVital)
+    : vitalStore.add({ id: generateId(), ...definedVital })
   return [...next].sort((a, b) => a.date.localeCompare(b.date))
 }
 
@@ -242,4 +246,10 @@ export function getLifetimeStats(): LifetimeStats {
   void sortedDates
 
   return { totalWeightKg, currentWeightKg, activeDays, currentStreak, lastSevenDaysWeights }
+}
+
+function omitUndefined<T extends Record<string, unknown>>(value: T): T {
+  return Object.fromEntries(
+    Object.entries(value).filter(([, entry]) => entry !== undefined)
+  ) as T
 }

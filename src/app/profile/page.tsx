@@ -23,15 +23,21 @@ export default function DashboardPage() {
   })
 
   return (
-    <div className="mx-auto w-full max-w-lg flex-1 px-5 pt-6 pb-28 md:max-w-2xl">
+    <div className="mx-auto w-full max-w-lg flex-1 px-5 pt-7 pb-28 md:max-w-2xl">
 
       {/* Header */}
-      <header className="flex items-center justify-between mb-5">
-        <h1 className="text-2xl font-bold tracking-tight">{t.dashboard.title}</h1>
+      <header className="mb-6 flex items-end justify-between">
+        <div>
+          <p className="font-mono text-[11px] font-bold uppercase tracking-[0.2em]" style={{ color: 'var(--muted)' }}>
+            Companion
+          </p>
+          <h1 className="font-mono text-4xl font-bold leading-none tracking-normal">{t.dashboard.title}</h1>
+        </div>
         <Link
           href="/settings"
           aria-label={t.settings.title}
-          className="tap-scale flex size-10 items-center justify-center rounded-full border border-zinc-800 bg-surface-2 text-zinc-400 transition-colors hover:text-zinc-200"
+          className="tap-scale flex size-10 items-center justify-center border-2 transition-colors"
+          style={{ borderColor: 'var(--foreground)', color: 'var(--foreground)' }}
         >
           <Settings className="size-4" aria-hidden="true" />
         </Link>
@@ -39,19 +45,19 @@ export default function DashboardPage() {
 
       {/* Profile summary / onboarding */}
       {mounted && profile ? (
-        <div className="rounded-2xl border border-zinc-800 bg-surface-1 p-4 mb-4">
+        <div className="mb-4 border-[3px] p-4" style={{ background: 'var(--surface-1)', borderColor: 'var(--foreground)' }}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-semibold text-foreground">
+              <p className="font-mono text-sm font-bold text-foreground">
                 {goalLabels[profile.goal]} · {experienceLabels[profile.experience]}
               </p>
-              <p className="text-xs text-zinc-500 mt-0.5">
+              <p className="mt-0.5 text-xs" style={{ color: 'var(--muted)' }}>
                 {profile.height} cm · {profile.weight} kg
               </p>
             </div>
             <Link
               href="/profile/edit"
-              className="tap-scale flex items-center gap-1.5 rounded-xl border border-zinc-800 px-3 py-2 text-xs font-medium text-zinc-300 transition-colors hover:border-primary/40 hover:text-primary"
+              className="btn-ink tap-scale flex items-center gap-1.5 px-3 py-2 text-xs font-bold"
             >
               <Pencil className="size-3.5" aria-hidden="true" />
               {t.dashboard.editProfile}
@@ -61,18 +67,19 @@ export default function DashboardPage() {
       ) : (
         <Link
           href="/profile/edit"
-          className="tap-scale flex items-center gap-3 rounded-2xl border border-primary/20 bg-primary-dim/30 p-4 mb-4"
+          className="tap-scale mb-4 flex items-center gap-3 border-[3px] p-4"
+          style={{ background: 'var(--surface-1)', borderColor: 'var(--foreground)' }}
         >
-          <span className="flex size-10 items-center justify-center rounded-xl bg-primary-dim text-primary">
+          <span className="btn-ink flex size-10 items-center justify-center">
             <UserPlus className="size-5" aria-hidden="true" />
           </span>
-          <span className="text-sm text-zinc-300">{t.dashboard.noProfile}</span>
+          <span className="text-sm font-semibold">{t.dashboard.noProfile}</span>
         </Link>
       )}
 
       {/* Health row: BMI + Weight (only with profile metrics) */}
       {mounted && profile && (
-        <div className="grid grid-cols-2 gap-4 mb-4">
+        <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
           <BmiCard height={profile.height} weight={profile.weight} />
           <WeightChart />
         </div>

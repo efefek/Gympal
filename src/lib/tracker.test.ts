@@ -9,6 +9,10 @@ import {
   toggleChecklistDone,
   checklistCompletion,
   setMeal,
+  logMeasurement,
+  getMeasurements,
+  logVital,
+  getVitals,
   mealStore,
   checklistStore,
   type ChecklistItem,
@@ -166,5 +170,53 @@ describe('setMeal', () => {
     // Assert
     expect(result).toHaveLength(0)
     expect(mealStore.get()).toHaveLength(0)
+  })
+})
+
+describe('logMeasurement', () => {
+  beforeEach(() => localStorage.clear())
+
+  it('preserves existing same-day fields when partial updates omit them', () => {
+    // Arrange
+    logMeasurement({ date: '2026-06-13', weight: 75, waistCirc: 82 }, '2026-06-13')
+
+    // Act
+    const result = logMeasurement({ date: '2026-06-13', chest: 101 }, '2026-06-13')
+
+    // Assert
+    expect(result).toHaveLength(1)
+    expect(getMeasurements()[0]).toMatchObject({
+      date: '2026-06-13',
+      weight: 75,
+      waistCirc: 82,
+      chest: 101,
+    })
+  })
+
+  it('stores thigh circumference when logged', () => {
+    // Act
+    logMeasurement({ date: '2026-06-14', thighCirc: 55 }, '2026-06-14')
+
+    // Assert
+    expect(getMeasurements()[0].thighCirc).toBe(55)
+  })
+})
+
+describe('logVital', () => {
+  beforeEach(() => localStorage.clear())
+
+  it('preserves existing same-day vitals when partial updates omit them', () => {
+    // Arrange
+    logVital({ date: '2026-06-13', waterMl: 1800, proteinG: 120 }, '2026-06-13')
+
+    // Act
+    logVital({ date: '2026-06-13', foodKcal: 2200 }, '2026-06-13')
+
+    // Assert
+    expect(getVitals()[0]).toMatchObject({
+      waterMl: 1800,
+      proteinG: 120,
+      foodKcal: 2200,
+    })
   })
 })

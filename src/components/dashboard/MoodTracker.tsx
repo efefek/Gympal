@@ -11,7 +11,7 @@ const LEVELS: MoodLevel[] = [1, 2, 3, 4, 5]
 function MoodFace({ level, active }: { level: MoodLevel; active: boolean }) {
   // curve: level 1 = frown (positive control-Y), level 5 = big smile (negative)
   const curve = (3 - level) * 6 // 12 … -12
-  const color = active ? '#000' : 'currentColor'
+  const color = active ? 'var(--ink-text)' : 'currentColor'
   return (
     <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
       <circle cx="9.5" cy="11" r="1.6" fill={color} />
@@ -38,9 +38,9 @@ export default function MoodTracker() {
   }
 
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-surface-1 p-4">
-      <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500">{t.dashboard.mood.title}</span>
-      <p className="text-sm text-zinc-400 mt-1 mb-3">{t.dashboard.mood.question}</p>
+    <div className="border-[3px] p-4" style={{ background: 'var(--surface-1)', borderColor: 'var(--foreground)' }}>
+      <span className="font-mono text-xs font-bold uppercase tracking-[0.18em]" style={{ color: 'var(--muted)' }}>{t.dashboard.mood.title}</span>
+      <p className="mb-3 mt-1 text-sm" style={{ color: 'var(--muted)' }}>{t.dashboard.mood.question}</p>
 
       <div className="flex items-center justify-between gap-2">
         {LEVELS.map((value) => {
@@ -53,8 +53,9 @@ export default function MoodTracker() {
               aria-label={t.dashboard.mood.levels[value - 1]}
               onClick={() => select(value)}
               className={`tap-scale flex size-11 items-center justify-center rounded-full transition-colors ${
-                active ? 'bg-primary text-black' : 'bg-surface-2 text-zinc-500 hover:text-zinc-300'
+                active ? 'btn-ink' : 'bg-surface-2 hover:text-foreground'
               }`}
+              style={{ color: active ? undefined : 'var(--muted)' }}
             >
               <MoodFace level={value} active={active} />
             </button>

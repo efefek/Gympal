@@ -53,8 +53,8 @@ export default function CheckableList<T extends ListItem>({
   const inputId = `list-input-${title.replace(/\s+/g, '-').toLowerCase()}`
 
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-surface-1 p-4">
-      <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500">{title}</span>
+    <div className="border-[3px] p-4" style={{ background: 'var(--surface-1)', borderColor: 'var(--foreground)' }}>
+      <span className="font-mono text-xs font-bold uppercase tracking-[0.18em]" style={{ color: 'var(--muted)' }}>{title}</span>
 
       <ul className="space-y-1.5 mt-3">
         {sorted.map((item) => (
@@ -65,12 +65,12 @@ export default function CheckableList<T extends ListItem>({
               aria-label={`${item.text}${item.done ? ', done' : ''}`}
               onClick={() => handleToggle(item.id, item.done)}
               className={`tap-scale flex size-6 shrink-0 items-center justify-center rounded-md border transition-colors ${
-                item.done ? 'bg-primary border-primary text-black' : 'border-zinc-700 text-transparent'
+                item.done ? 'btn-ink border-transparent' : 'border-zinc-700 text-transparent'
               }`}
             >
               <Check className="size-4" aria-hidden="true" />
             </button>
-            <span className={`flex-1 text-sm ${item.done ? 'text-zinc-600 line-through' : 'text-zinc-300'}`}>{item.text}</span>
+            <span className={`flex-1 text-sm ${item.done ? 'line-through' : ''}`} style={{ color: item.done ? 'var(--muted)' : 'var(--foreground)' }}>{item.text}</span>
             <button
               type="button"
               aria-label={`${t.common.delete} ${item.text}`}
@@ -84,7 +84,7 @@ export default function CheckableList<T extends ListItem>({
       </ul>
 
       {mounted && sorted.length === 0 && (
-        <p className="text-xs text-zinc-600 mt-1">{emptyText}</p>
+        <p className="mt-1 text-xs" style={{ color: 'var(--muted)' }}>{emptyText}</p>
       )}
 
       <div className="flex gap-2 mt-3">
@@ -96,13 +96,14 @@ export default function CheckableList<T extends ListItem>({
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
-          className="flex-1 rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-foreground placeholder-zinc-600 outline-none focus:border-primary/50"
+          className="flex-1 border px-3 py-2 text-sm outline-none"
+          style={{ background: 'var(--surface-2)', borderColor: 'var(--card-border)', color: 'var(--foreground)' }}
         />
         <button
           type="button"
           aria-label={t.common.add}
           onClick={handleAdd}
-          className="tap-scale flex size-9 items-center justify-center rounded-xl bg-primary text-black"
+          className="btn-ink tap-scale flex size-9 items-center justify-center"
         >
           <Plus className="size-4" aria-hidden="true" />
         </button>
