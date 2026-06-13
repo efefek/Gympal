@@ -58,6 +58,54 @@ src/
 - Tum hatalari acikca yakala, sessizce yutma
 - Sabit degerler icin magic number yerine named constant kullan
 
+## Git / Commit Konvansiyonu
+
+Tum commit'ler **Conventional Commits** formatinda olmalidir. Her mantikli adim ayri,
+aciklayici bir commit olsun — GitHub gecmisi duzenli ve profesyonel gorunsun
+(is basvurusu icin onemli). Her `git push` oncesi commit'ler bu formatta hazirlanir.
+
+### Format
+
+```
+<tip>: <kisa aciklama>
+
+<opsiyonel govde — ne ve neden>
+```
+
+- `<tip>` kucuk harf, aciklama emir kipinde ve kisa (~50 karakter)
+- Govde gerektiginde "ne" + "neden" anlatir (nasil degil)
+
+### Tipler
+
+| Tip | Ne zaman kullanilir |
+|-----|---------------------|
+| `feat` | Yeni ozellik (yeni sayfa, bilesen, kullanici-gorur islev) |
+| `fix` | Hata duzeltme (bug, kirik davranis, regresyon) |
+| `refactor` | Davranis degismeden kod yeniden duzenleme (isim, bolme, sadelestirme) |
+| `style` | Bicimsel degisiklik (format, bosluk, CSS — mantik degismez) |
+| `docs` | Dokumantasyon (README, yorum, docs/) |
+| `test` | Test ekleme/duzenleme |
+| `chore` | Bakim isleri (bagimlilik, config, build araclari) |
+| `perf` | Performans iyilestirmesi |
+| `ci` | CI/CD yapilandirmasi |
+
+### Ornekler
+
+```
+feat: add interactive stats sheet to home dashboard
+fix: prevent hydration mismatch in theme toggle
+refactor: extract motion tokens into lib/motion.ts
+docs: add architecture section to README
+test: cover measurement logging in tracker
+chore: add motion and vaul dependencies
+```
+
+### Kurallar
+
+- Bir commit = bir mantikli degisiklik (her seyi tek dev commit'e tikmadan)
+- Atribusyon `~/.claude/settings.json` ile global kapali — commit'e ekleme
+- Push oncesi: `npm run lint` + `npm run test` + `npm run build` yesil olmali
+
 ## Erisebilirlik Standardi
 
 - Her interaktif eleman klavye + ekran okuyucu ile erisebilir olmalidir
