@@ -26,6 +26,8 @@ export interface PagerApi {
   index: number;
   total: number;
   paginate: (dir: number) => void;
+  /** 0..count-1 arası canlı geçiş değeri — parallax katmanları buna bağlanır. */
+  progress: SharedValue<number>;
 }
 
 interface Props {
@@ -71,7 +73,7 @@ export function PanelPager({ panels }: Props) {
     <Animated.View style={styles.root}>
       {panels.map((render, i) => (
         <PanelLayer key={i} index={i} progress={progress} height={height} reduced={reduced}>
-          {render({ index: i, total: count, paginate })}
+          {render({ index: i, total: count, paginate, progress })}
         </PanelLayer>
       ))}
     </Animated.View>

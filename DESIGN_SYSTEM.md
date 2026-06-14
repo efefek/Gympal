@@ -181,3 +181,51 @@ Basit **aktivite bazlı eşleşme**. **Cinsiyetsiz, sadece aktivite**:
 - `exercises.json` (1323 kayıt) ve GIF CDN akışı korunur; yalnız medya gösterimi RN'e uyarlanır.
 - Tüm localStorage key'leri ve veri yapısı MMKV'ye **birebir** taşınır (key ve şekil değişmez).
 - Zero backend korunur; tek dış bağlantı Buddy → Groq (bkz. `BUDDY_ARCHITECTURE.md`).
+
+---
+
+## 11. Görsel Dil — Referans Sentezi (Faz 4)
+
+> Kullanıcının 17 referans + yorumundan çıkarılan bağlayıcı görsel dil. Her ekran buna uyacak.
+> Renkler referanslardan ALINMAZ (bizim tek-renk tema), sadece **dizilim, tipografi, kart kurgusu, grafik dili** alınır.
+
+### 11.1 Tipografi (en kritik)
+- **Bauhaus / brutalist bold display.** Dev, `font-display` (Geist Black), sol-hizalı, satır satır kırılan başlıklar (ref: "Mood / diary", "Statistics", "Track. Understand. Thrive.").
+- Başlık = tasarımın kendisi. Hero başlık ekranın üst üçte birini kaplar, çok büyük (48–72px), tracking-tighter.
+- Body net ve okunur; mikro-etiketler `font-mono` uppercase, geniş tracking.
+- Sadelik var ama "o kadar da sade değil" — başlık + birkaç bold öğe + dolu ama nefes alan layout.
+
+### 11.2 Renk
+- **GRADIENT YOK.** Hiçbir yerde gradient kullanılmaz (kullanıcı kesin).
+- Tek tema (`--bg`/`--fg`) her ekranda aynı zemin.
+- **Accent (turuncu/sarı) yalnız vurgu**: aktif sekme, aktif chip, today-dot, primary CTA, streak. "Tek-az-renk" buralarda görünür.
+- Kart renk-alternatifi: çoğu kart `surface`; **bir öne çıkan kart accent zeminli** (siyah bold typo üstünde) — ref Image 11/12/14 lime kartlar, Image 1 vurgu chip'leri.
+- Pastel düşük-satürasyon = yalnız veri/grafik kodlaması (takvim noktaları, trend serileri).
+
+### 11.3 Kartlar & Yüzeyler
+- Yuvarlak köşe (rounded-2xl/3xl), net `1.5px` border, dolgulu iç boşluk.
+- **Border'lı "cep" geçiş**: ana ekrandan alt ekrana inerken border'lı bir kart/sheet yukarıdan iner (ref Image 2). Customize/detay bu cepte açılır.
+- Full-page dolma: boş alan minimum, içerik bölümleri ritimli (ref Image 8/9).
+
+### 11.4 Hareket
+- **Parallax şart**: panel geçişinde ve scroll'da başlık / takvim / kartlar **ayrı hızda** hareket eder (tek blok slide DEĞİL). PanelPager `progress` paylaşır; katmanlar farklı katsayıyla bağlanır.
+- Text reveal (cult-ui ilhamı): hero başlık karakter/kelime bazlı staggered fade+slide-up reveal (Reanimated).
+- Beğenilen swipe akıcılığı korunur (ease-in-out, 70px/400vel eşik).
+- ADHD: amaçlı hareket, boşta dekoratif animasyon yok, reduced-motion saygısı.
+
+### 11.5 Ribbon'lar (netleşti)
+- **Sol üst = durum çapası** (kapalı blok). ADHD-friendly: bugünkü plan, streak, su/intake, sosyal bildirim. Eski Settings + "01/02" sayaç KALDIRILDI.
+- **Sağ üst = profil**, 3 aşama: kapalı blok → tap: küçük pop-up (brief info özeti) → tap: tam ekran profil + achievement. Settings buradan (profil içinden) erişilir.
+
+### 11.6 Alt Bar
+- İkon + metin (Bunker/Vitals/Buddy/Social). **Gradient yok.** Bold, net, materyal.
+- Aktif sekme **accent renkte** (tema accent'i: turuncu/sarı).
+
+### 11.7 Ekran-özel referans notları
+- **Vitals**: cetvel/ruler intake göstergesi (su/protein/kalori — ref Image 10), bold sayılar, bar + ring grafik (Image 3/4/7), tap-to-cycle period.
+- **Workout başlat**: total time + kalori + çalışacak kas grubu özeti + egzersiz listesi (ref Image 11). Üstte büyük görsel.
+- **Aktif workout**: büyük kas-anatomi GIF (MuscleWiki, sonra HQ ile değişecek), altta geri + swipe-next + timing (ref Image 12).
+- **Template'ler**: ~20 hazır program template (dolu görünsün + test edilebilir), interval kartları (ref Image 14).
+- **Onboarding/profil**: betterFit tarzı adım adım, ruler slider (boy/kilo), BMI bar, basit karakter, "Next" (ref Image 15). measurement öğeleri korunur.
+- **Buddy**: "How can I help today, {name}?" + öneri chip'leri/kartları (ref Image 13/17), tek-cümle → tool calls vurgusu.
+- **Harita (Social)**: sade dark map + minimal pin + mesafe/süre/kalori kartı (ref Image 5), neon yok.
