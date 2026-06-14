@@ -1,8 +1,9 @@
-import { MMKV } from 'react-native-mmkv'
+import { createMMKV } from 'react-native-mmkv'
 import * as Crypto from 'expo-crypto'
 
 // Singleton MMKV instance — tüm gympal-* key'leri buraya yazar
-export const mmkv = new MMKV()
+// react-native-mmkv v4 Nitro: instance createMMKV() ile oluşturulur
+export const mmkv = createMMKV()
 
 export interface StoredItem {
   id: string

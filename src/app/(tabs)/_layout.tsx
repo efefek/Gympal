@@ -1,5 +1,5 @@
 import { Tabs, router } from 'expo-router';
-import { Pressable, View } from 'react-native';
+import { Pressable } from 'react-native';
 import {
   House,
   HeartPulse,
@@ -7,50 +7,35 @@ import {
   Users,
   CircleUserRound,
 } from 'lucide-react-native';
-import { defaultTheme } from '@/lib/tokens';
+import { Fonts } from '@/lib/tokens';
+import { useTheme } from '@/lib/theme-context';
 
 const ICON_SIZE = 22;
-const c = defaultTheme;
 
 // Sağ üst profil ikonu — her sekmede sabit
-function ProfileButton() {
+function ProfileButton({ color }: { color: string }) {
   return (
     <Pressable
       onPress={() => router.push('/profile')}
       style={{ paddingRight: 16, paddingVertical: 8 }}
       hitSlop={8}
     >
-      <CircleUserRound size={22} color={c.fg} />
+      <CircleUserRound size={22} color={color} />
     </Pressable>
   );
 }
 
-// Sol/sağ ribbon placeholder — Faz 4'te açılır panel haline gelecek
-// Kapalıyken köşede siyah blok olarak durur (DESIGN_SYSTEM.md §2)
-function LeftRibbon() {
-  return (
-    <View
-      style={{
-        width: 8,
-        height: 32,
-        backgroundColor: c.bg,
-        borderRadius: 2,
-        marginLeft: 0,
-      }}
-    />
-  );
-}
-
 export default function TabsLayout() {
+  const { theme: c } = useTheme();
   return (
     <Tabs
       screenOptions={{
         headerShown: true,
         headerStyle: { backgroundColor: c.bg },
         headerShadowVisible: false,
-        headerLeft: () => <LeftRibbon />,
-        headerRight: () => <ProfileButton />,
+        headerRight: () => <ProfileButton color={c.fg} />,
         headerTitle: '',
+        sceneStyle: { backgroundColor: c.bg },
         tabBarStyle: {
           backgroundColor: c.surface1,
           borderTopColor: c.border,
@@ -59,7 +44,7 @@ export default function TabsLayout() {
         tabBarActiveTintColor: c.fg,
         tabBarInactiveTintColor: c.muted,
         tabBarLabelStyle: {
-          fontFamily: 'GeistMono',
+          fontFamily: Fonts.mono,
           fontSize: 10,
           letterSpacing: 0.5,
           textTransform: 'uppercase',
