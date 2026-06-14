@@ -20,16 +20,17 @@ interface Props {
 export function HorizontalRuler({ value, min, max, step = 1, unit, onChange }: Props) {
   const { theme } = useTheme();
   const { width } = useWindowDimensions();
-  const ref = useRef<ScrollView>(null);
   const sidePad = width / 2 - 12;
+
+  const valueToOffset = (v: number) => ((v - min) / step) * TICK_W;
+  // İlk scroll pozisyonu yalnız mount'ta — value değişince RESETLENMEZ (bug fix)
+  const initialOffset = useRef(valueToOffset(value)).current;
 
   const ticks = useMemo(() => {
     const arr: number[] = [];
     for (let v = min; v <= max; v += step) arr.push(v);
     return arr;
   }, [min, max, step]);
-
-  const valueToOffset = (v: number) => ((v - min) / step) * TICK_W;
 
   const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const x = e.nativeEvent.contentOffset.x;
@@ -50,20 +51,19 @@ export function HorizontalRuler({ value, min, max, step = 1, unit, onChange }: P
 
       <View>
         <ScrollView
-          ref={ref}
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentOffset={{ x: valueToOffset(value), y: 0 }}
+          contentOffset={{ x: initialOffset, y: 0 }}
           contentContainerStyle={{ paddingHorizontal: sidePad }}
           snapToInterval={TICK_W}
           decelerationRate="fast"
+          onScroll={handleScroll}
           onMomentumScrollEnd={handleScroll}
-          onScrollEndDrag={handleScroll}
           scrollEventThrottle={16}
         >
-          {ticks.map((v) => {
-            const major = v % 10 === 0;
-            const mid = v % 5 === 0;
+          {ticks.map((v, i) => {
+            const major = i % 10 === 0;
+            const mid = i % 5 === 0;
             return (
               <View key={v} style={{ width: TICK_W, alignItems: 'center', justifyContent: 'flex-start' }}>
                 <View

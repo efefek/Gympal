@@ -18,6 +18,8 @@ export type EquipmentType =
 
 export type WorkoutLocation = 'home' | 'gym'
 
+export type GymStyle = 'bodybuilding' | 'calisthenics' | 'cardio' | 'swimming' | 'powerlifting' | 'crossfit'
+
 export interface UserProfile {
   height: number
   weight: number
@@ -30,6 +32,29 @@ export interface UserProfile {
   allergens?: string
   dailyWaterMlTarget?: number
   dailyProteinGTarget?: number
+  // Faz 4: gym modunda antrenman stili + kullanmak istemediği ekipman
+  gymStyle?: GymStyle
+  dislikedEquipment?: EquipmentType[]
+}
+
+export const gymStyleLabels: Record<GymStyle, string> = {
+  bodybuilding: 'Bodybuilding',
+  calisthenics: 'Calisthenics',
+  cardio: 'Cardio',
+  swimming: 'Swimming',
+  powerlifting: 'Powerlifting',
+  crossfit: 'CrossFit',
+}
+
+export const dietLabels: Record<string, string> = {
+  none: 'No preference',
+  vegetarian: 'Vegetarian',
+  vegan: 'Vegan',
+  keto: 'Keto',
+  paleo: 'Paleo',
+  high_protein: 'High protein',
+  low_carb: 'Low carb',
+  mediterranean: 'Mediterranean',
 }
 
 import { mmkv } from './storage'
