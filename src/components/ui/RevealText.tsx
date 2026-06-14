@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react';
-import { View, type TextProps } from 'react-native';
+import { View, type TextStyle, type StyleProp } from 'react-native';
 import Animated, {
   FadeInDown,
   useReducedMotion,
@@ -7,34 +7,43 @@ import Animated, {
 
 /* RevealText — kelime bazlı staggered reveal (fade + slide-up).
    cult-ui text-animate ilhamı; Reanimated entering ile.
-   Bauhaus hero başlıklar için. Reduced-motion'da anında görünür. */
+   Bauhaus hero başlıklar için. Reduced-motion'da anında görünür.
+   NOT: Animated.Text NativeWind className'i almaz — renk/font style ile verilir. */
 
-interface Props extends TextProps {
+interface Props {
   text: string;
+  /** color, fontFamily, fontSize vb. — Animated.Text className almadığı için style zorunlu. */
+  style?: StyleProp<TextStyle>;
   /** Kelimeler arası gecikme (ms). */
   stagger?: number;
   /** Başlangıç gecikmesi (ms). */
   delay?: number;
-  className?: string;
 }
 
-export function RevealText({ text, stagger = 55, delay = 80, className, style, ...rest }: Props) {
+export function RevealText({ text, style, stagger = 55, delay = 80 }: Props) {
   const reduced = useReducedMotion();
-  const words = text.split(' ');
+  // Satır kırılımlarını koru: "\n" içeren metinde her kelime bloğu sırayla gelir
+  const segments = text.split('\n');
 
+  let wordCounter = 0;
   return (
-    <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-      {words.map((word, i) => (
-        <Animated.Text
-          key={`${word}-${i}`}
-          entering={reduced ? undefined : FadeInDown.delay(delay + i * stagger).springify().damping(18)}
-          className={className}
-          style={style}
-          {...rest}
-        >
-          {word}
-          {i < words.length - 1 ? ' ' : ''}
-        </Animated.Text>
+    <View>
+      {segments.map((line, lineIdx) => (
+        <View key={lineIdx} style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+          {line.split(/\s+/).filter(Boolean).map((word, i) => {
+            const idx = wordCounter++;
+            return (
+              <Animated.Text
+                key={`${word}-${lineIdx}-${i}`}
+                entering={reduced ? undefined : FadeInDown.delay(delay + idx * stagger).springify().damping(18)}
+                style={style}
+              >
+                {word}
+                {' '}
+              </Animated.Text>
+            );
+          })}
+        </View>
       ))}
     </View>
   );

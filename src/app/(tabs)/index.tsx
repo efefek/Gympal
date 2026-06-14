@@ -19,7 +19,7 @@ import { getLifetimeStats } from '@/lib/tracker';
 import { getWeekDates, isToday, formatDate, DAY_LABELS, todayWeekIndex } from '@/lib/week';
 import { loadProgram, todayDayData } from '@/lib/program-store';
 import type { WorkoutProgram } from '@/lib/workout';
-import { SERIES } from '@/lib/tokens';
+import { SERIES, Fonts } from '@/lib/tokens';
 import { useTheme } from '@/lib/theme-context';
 
 interface BunkerData {
@@ -121,8 +121,7 @@ function DashboardPanel({ data, api }: { data: BunkerData; api: PagerApi }) {
         </Text>
         <RevealText
           text={greeting()}
-          className="font-display text-fg"
-          style={{ fontSize: 60, lineHeight: 58, letterSpacing: -2.5 }}
+          style={{ fontFamily: Fonts.display, color: theme.fg, fontSize: 60, lineHeight: 58, letterSpacing: -2.5 }}
         />
         {profile && (
           <RevealBlock delay={260}>
@@ -293,7 +292,7 @@ function ProgramPanel({ program, api }: { program: WorkoutProgram | null; api: P
             <Text className="font-mono text-[11px] uppercase text-muted mb-3" style={{ letterSpacing: 3 }}>
               Program
             </Text>
-            <RevealText text={'No\nprogram'} className="font-display text-fg" style={{ fontSize: 52, lineHeight: 50, letterSpacing: -2 }} />
+            <RevealText text={'No\nprogram'} style={{ fontFamily: Fonts.display, color: theme.fg, fontSize: 52, lineHeight: 50, letterSpacing: -2 }} />
             <Pressable
               onPress={() => router.push('/profile/edit')}
               className="flex-row items-center gap-2 rounded-full px-6 py-3 self-start mt-6"
@@ -310,7 +309,7 @@ function ProgramPanel({ program, api }: { program: WorkoutProgram | null; api: P
             <Text className="font-mono text-[11px] uppercase text-muted mb-3" style={{ letterSpacing: 3 }}>
               Program
             </Text>
-            <RevealText text={program.name} className="font-display text-fg" style={{ fontSize: 44, lineHeight: 44, letterSpacing: -2 }} />
+            <RevealText text={program.name} style={{ fontFamily: Fonts.display, color: theme.fg, fontSize: 44, lineHeight: 44, letterSpacing: -2 }} />
             <Text className="mt-3 font-mono text-[11px] text-muted">{program.daysPerWeek} days / week</Text>
           </>
         )}
