@@ -285,3 +285,249 @@ Bu Faz 0 analizi onaylanınca **Faz 1**: detaylı eşleştirme tablosu eklenecek
 Leaflet→react-native-maps, localStorage→MMKV, lucide-react→lucide-react-native, Vitest→Jest+RNTL).
 
 **Açık karar (Faz 1 öncesi netleşmeli):** Mobil bottom nav'da "Maps" sekmesi olacak mı? (bkz. §2 uyumsuzluk)
+
+---
+
+## Faz 1 — Web → Native Eşleştirme Tablosu
+
+> Faz 0 analizi + DESIGN_SYSTEM.md + BUDDY_ARCHITECTURE.md üstüne oturur.
+> Kararlar onaylıdır; bu tablo Faz 2 kurulum adımlarının girdisidir.
+
+---
+
+### 1. Route / Navigasyon
+
+| Web (Next.js App Router) | Native (Expo Router) | Not |
+|--------------------------|----------------------|-----|
+| `app/page.tsx` → Bunker | `app/(tabs)/index.tsx` | BottomNav sekme 1 |
+| `app/body/page.tsx` | `app/(tabs)/vitals.tsx` | Sekme adı değişti: Body → Vitals |
+| `app/companion/page.tsx` | `app/(tabs)/buddy.tsx` | FAB kaldırıldı; artık tam sekme |
+| `app/social/page.tsx` | `app/(tabs)/social.tsx` | Yatay pager: feed/events/find-a-pal |
+| `app/profile/page.tsx` | `app/profile/index.tsx` | BottomNav'da değil; sağ ribbon → genişle |
+| `app/profile/edit/page.tsx` | `app/profile/edit.tsx` | Onboarding 4 adım korunur |
+| `app/program/page.tsx` | `app/program/index.tsx` | Bunker'dan modal/stack olarak açılır |
+| `app/exercises/page.tsx` | `app/exercises/index.tsx` | Server component → client filtre |
+| `app/settings/page.tsx` | `app/settings/index.tsx` | Settings stack içinde |
+| `app/gyms/page.tsx` | **KALDIRILDI** | Veri Social'a taşındı (`places.ts`) |
+| `app/parks/page.tsx` | **KALDIRILDI** | Veri Social'a taşındı |
+| `app/routes/page.tsx` | **KALDIRILDI** | Veri Social'a taşındı |
+| `app/layout.tsx` (ThemeProvider, BottomNav, Navbar) | `app/_layout.tsx` | Expo Router root layout; Navbar yok (native'de sadece BottomNav) |
+| `app/template.tsx`, `app/error.tsx` | `app/+not-found.tsx`, hata boundary | Expo Router hata işleme |
+
+**BottomNav (native — 4 sekme, FAB yok):**
+
+| Sıra | Sekme | Route | Eski karşılık |
+|------|-------|-------|---------------|
+| 1 | Bunker | `(tabs)/index` | `/` |
+| 2 | Vitals | `(tabs)/vitals` | `/body` |
+| 3 | Buddy | `(tabs)/buddy` | `/companion` (mock → Groq) |
+| 4 | Social | `(tabs)/social` | `/social` |
+
+Profile: her ekranda **sağ üst ikon** → `app/profile/` stack.
+
+---
+
+### 2. UI Primitive'leri
+
+| Web | Native | Not |
+|-----|--------|-----|
+| `<div>` (layout) | `<View>` | Temel kapsayıcı |
+| `<span>`, `<p>` | `<Text>` | Tüm metin `<Text>` içinde olmalı |
+| `<button>` | `<Pressable>` | `activeOpacity` / `android_ripple` ile; `tap-scale` (active:scale .96) → `Animated.scale` |
+| `<img>` (egzersiz GIF) | `<Image>` (`expo-image`) | GIF RN Image ile çalışır; `expo-image` cache + placeholder desteği ekler |
+| `<video>` (`mp4` fallback) | `<Video>` (`expo-av` veya `expo-video`) | `NEXT_PUBLIC_EXERCISE_VIDEO_BASE` → `EXPO_PUBLIC_EXERCISE_VIDEO_BASE` |
+| `<input>`, `<textarea>` | `<TextInput>` | NativeWind ile stillenebilir |
+| `<select>` | `<Picker>` veya custom `<Pressable>` listesi | Basit seçimler için custom tercih edilir |
+| `<a>` (internal) | `<Link>` (expo-router) | |
+| `<ScrollView>` (web) | `<ScrollView>` | API benzer; `horizontal` prop ile yatay |
+| `<FlatList>` / `<SectionList>` | `<FlatList>` / `<SectionList>` | Egzersiz grid, social feed için |
+| `vaul` bottom sheet | `@gorhom/bottom-sheet` | Gesture-native sheet; API farklı |
+| `canvas-confetti` | `react-native-confetti-cannon` veya `lottie-react-native` | Kutlama efekti |
+| `recharts` trend grafik | `victory-native` veya `react-native-skia` tabanlı | Skia: Reanimated ile entegre, GPU render |
+
+---
+
+### 3. Stil — Tailwind/CSS → NativeWind v5
+
+| Web | Native | Not |
+|-----|--------|-----|
+| `tailwind.config` + `globals.css` CSS custom properties | `tailwind.config.ts` + `theme.extend` + TS token modülü | NativeWind v5 CSS Variables desteği var; `--bg`/`--fg` token'ları config'e alınır |
+| `--bg`, `--fg` ve türevleri (globals.css) | `tailwind.config.ts → theme.colors` + `src/lib/tokens.ts` | oklch → hex/rgb dönüşümü (RN oklch desteklemez) |
+| `data-theme="dark"/"light"` attribute | ThemeContext (custom) + `useColorScheme` | `next-themes` yok (bkz. §8); token'lar runtime swap |
+| `className="..."` (web) | `className="..."` (NativeWind v5) | Syntax aynı; NativeWind compile-time dönüştürür |
+| `safe-bottom`, `pb-safe-nav` (env safe-area) | `react-native-safe-area-context` `SafeAreaView` / `useSafeAreaInsets` | |
+| `scrollbar-hide` | ScrollView `showsVerticalScrollIndicator={false}` | |
+| `glass` (backdrop-blur) | RN'de `BlurView` (`expo-blur`) | Sınırlı platform desteği; sparingly |
+| `skeleton` shimmer | `react-native-skeleton-placeholder` veya Reanimated shimmer | |
+| Geist Sans / Geist Mono (`next/font`) | `expo-font` ile yükle | `useFonts` hook; splash screen fontlara kadar bekler |
+| `animate-fade-in-up`, `slide-up` CSS | Reanimated 3 `withTiming` / `withSpring` | CSS animation → RN animated value |
+
+**NativeWind v5 token entegrasyon özeti:**
+```ts
+// tailwind.config.ts (özet)
+theme: {
+  extend: {
+    colors: {
+      bg: 'var(--bg)',       // runtime CSS variable (NativeWind v5 destekler)
+      fg: 'var(--fg)',
+      surface1: 'var(--surface-1)',
+      surface2: 'var(--surface-2)',
+      border: 'var(--border)',
+      muted: 'var(--muted)',
+      ink: 'var(--ink)',
+      'ink-text': 'var(--ink-text)',
+      // veri serileri
+      'series-red': '#c97171',
+      'series-blue': '#7195c9',
+      // ...
+    }
+  }
+}
+```
+
+---
+
+### 4. Animasyon / Hareket
+
+| Web (`motion/react`) | Native | Not |
+|----------------------|--------|-----|
+| `motion.div` (`PanelPager` dikey gesture pager) | `Gesture.Pan` (RNGH) + `useAnimatedStyle` (Reanimated 3) | Swipe eşikleri: SWIPE_OFFSET=70, SWIPE_VELOCITY=400 — birebir korunur |
+| `useMotionValue`, `useTransform` | `useSharedValue`, `useDerivedValue` | |
+| `drag`, `dragConstraints` | `Gesture.Pan` + `clamp` | |
+| `variants` + `stagger` (panelChildVariants, 0.07s stagger) | `withDelay` + `withTiming` döngüsü veya `react-native-reanimated-carousel` | Stagger 0.07, delayChildren 0.12 korunur |
+| `layoutId="bottomnav-indicator"` kayar gösterge | Reanimated `useAnimatedStyle` + `SharedValue` pozisyon | |
+| `prefers-reduced-motion` → drag kapalı, sadece fade | `useReducedMotionConfig` (Reanimated 3.x) | Reanimated reduced motion API'si var |
+| `ease-in-out [0.45,0,0.55,1]` panel geçişi | `Easing.bezier(0.45, 0, 0.55, 1)` | |
+| `ease-out-expo cubic-bezier(0.16,1,0.3,1)` | `Easing.bezier(0.16, 1, 0.3, 1)` | |
+| `active:scale-.96` tap-scale | `useAnimatedStyle` + `withTiming` scale | Pressable `onPressIn/Out` |
+| Takvim yatay swipe (`weekOffset` ±1) | `Gesture.Pan` yatay + `FlatList` pagingEnabled | |
+| Social yatay 3 panel pager | `react-native-pager-view` veya `FlatList` horizontal pagingEnabled | |
+
+---
+
+### 5. Harita
+
+| Web (Leaflet) | Native | Not |
+|---------------|--------|-----|
+| `leaflet` + imperative API, `DynamicMapView` (`ssr:false`) | `react-native-maps` (Google Maps / Apple Maps) | Expo SDK 56 ile `expo-maps` (yeni, beta) alternatif — Faz 2'de karar |
+| CARTO dark tile | Google Maps / Apple Maps varsayılan + minimal tema | Dark tile custom style (JSON) ile mümkün |
+| `divIcon` renkli marker (`#39ff14` neon, `#22d3ee` cyan) | `<Marker>` + custom `<View>` marker | Neon renkler kaldırılır; tema/pastel uyumlu |
+| `/gyms`, `/parks` ayrı route'lar | **Kalktı** — Social sekmesi içinde sade harita | `places.ts` verisi Social'a taşınır |
+| `londonGyms`, `londonParks`, `bikeRoutes` (`lib/places.ts`) | `src/data/places.ts` (aynı yapı) | Veri ve tip birebir korunur; sadece import yolu değişir |
+| `next/dynamic ssr:false` sarmalayıcı | `Platform.OS` kontrolü veya doğrudan import | RN'de SSR yok |
+
+---
+
+### 6. Kalıcı Depolama — localStorage → MMKV
+
+> **Altın kural: key isimleri, veri yapısı ve fonksiyon imzaları BİREBİR korunur.**
+> Yalnız `lib/storage.ts` iç gövdesi değişir; tüketici kod dokunulmaz.
+
+| Web (`localStorage`) | Native (`react-native-mmkv`) | Not |
+|----------------------|------------------------------|-----|
+| `localStorage.getItem(key)` | `storage.getString(key)` + `JSON.parse` | |
+| `localStorage.setItem(key, JSON.stringify(v))` | `storage.set(key, JSON.stringify(v))` | |
+| `localStorage.removeItem(key)` | `storage.delete(key)` | |
+| `createStore<T>(key)` generic soyutlaması (`lib/storage.ts`) | Aynı imza, MMKV gövde | Tek değişen yer burası; tüketici bileşenler değişmez |
+| `lib/profile.ts` (doğrudan localStorage) | Aynı imza, MMKV gövde | |
+| `lib/program-store.ts` (doğrudan localStorage) | Aynı imza, MMKV gövde | |
+| `crypto.randomUUID()` (`id` üretimi) | `expo-crypto` `randomUUID()` | RN'de `crypto.randomUUID` yok; polyfill veya expo-crypto |
+| `next-themes` key `"theme"` | `MMKV` key `"theme"` (veya `"gympal-theme"`) | ThemeContext custom, value schema aynı |
+
+**10 gympal-* key — tamamı MMKV'ye birebir:**
+
+| Key | Tür |
+|-----|-----|
+| `gympal-profile` | `UserProfile` |
+| `gympal-program-custom` | `WorkoutProgram` |
+| `gympal-weight-log` | `WeightEntry[]` |
+| `gympal-mood` | `MoodEntry[]` |
+| `gympal-checklist` | `ChecklistItem[]` |
+| `gympal-todos` | `TodoItem[]` |
+| `gympal-shopping` | `ShoppingItem[]` |
+| `gympal-meals` | `MealEntry[]` |
+| `gympal-measurements` | `BodyMeasurement[]` |
+| `gympal-vitals` | `HealthVital[]` |
+
+**Settings "clear all data" düzeltmesi (Faz 0'da tespit edilen bug):**
+Web'de `measurements` + `vitals` silinmiyordu. Native'de tüm `gympal-*` key'leri + `"theme"` silinir.
+
+---
+
+### 7. İkonlar
+
+| Web | Native | Not |
+|-----|--------|-----|
+| `lucide-react` | `lucide-react-native` | API aynı; import yolu değişir |
+| `<Icon size={20} />` | `<Icon size={20} color={...} />` | Native'de `color` prop zorunlu (CSS inherit yok) |
+| CSS `currentColor` otomatik renk | Explicit `color` token (`fg`, `muted` vb.) | |
+
+---
+
+### 8. Tema Sistemi
+
+| Web | Native | Not |
+|-----|--------|-----|
+| `next-themes` (`ThemeProvider`, `useTheme`) | Custom `ThemeContext` + `useColorScheme` | `next-themes` Expo'da çalışmaz |
+| `data-theme` HTML attribute | React Context value → NativeWind CSS variables | NativeWind v5 runtime CSS var desteği |
+| `defaultTheme="dark"`, `enableSystem={false}` | MMKV'den yükle, default `{ bg: '#0a0a0b', fg: '#f4f4f5' }` | |
+| İki sabit tema (dark/light) | Kullanıcı `--bg` + `--fg` özgürce seçer | DESIGN_SYSTEM.md §2: zemin + metin seçimi |
+| `globals.css` CSS variable dönüşümü | `tokens.ts` hex/rgb sabitleri + NativeWind theme | oklch → hex/rgb (RN oklch desteklemez) |
+
+---
+
+### 9. Test
+
+| Web | Native | Not |
+|-----|--------|-----|
+| Vitest | Jest (Expo preset) | `jest-expo` preset |
+| `@testing-library/react` | `@testing-library/react-native` | API büyük ölçüde aynı |
+| `jsdom` ortamı | RN test ortamı | |
+| `*.test.ts` (profile, storage, tracker, workout) | Aynı dosyalar, import yolları güncellenir | Saf logic testleri büyük ölçüde aynen geçer |
+| `vitest.config.ts` | `jest.config.js` (`jest-expo`) | |
+
+---
+
+### 10. Companion Mock → Buddy (Groq + Tool Calling)
+
+| Web (`/companion`) | Native (`(tabs)/buddy`) | Not |
+|--------------------|-------------------------|-----|
+| `lib/companion.ts` `getMockResponse()` anahtar-kelime eşleşmesi | `lib/buddy/groq-provider.ts` `resolveIntent()` | Groq API tool calling |
+| In-memory geçmiş (`messageHistory`, MAX 20, yenilenmez) | Opsiyonel MMKV geçmiş (karar Faz 3) | Şimdilik in-memory kalabilir |
+| Mock 500ms gecikme | Gerçek Groq API çağrısı | Loading state zorunlu |
+| Tool yok (sadece metin) | 13 tool: `logWater`, `logWeight`, `logMood` ... (bkz. BUDDY_ARCHITECTURE.md §3) | |
+| Sabit cevaplar | Model agnostik `BuddyProvider` interface → Groq implementasyonu | |
+| API key yok | Groq API key → MMKV `"gympal-buddy-key"` | Settings AI Companion bölümünde |
+
+**Faz 3 Opus notu:** Buddy tool intent eşleştirme prompt'u ilk kez tasarlanırken bir turluk Opus girdisi alınacak. O noktaya gelindiğinde hatırlatılacak.
+
+---
+
+### 11. Bağımlılık Eşleştirme (package.json delta)
+
+| Kaldırılacak (web) | Eklenecek (native) |
+|--------------------|--------------------|
+| `next`, `next-themes` | `expo`, `expo-router` |
+| `react-dom` | `react-native` |
+| `tailwindcss` (PostCSS) | `nativewind`, `tailwindcss` (NativeWind preset) |
+| `motion` (`motion/react`) | `react-native-reanimated`, `react-native-gesture-handler` |
+| `leaflet`, `react-leaflet` | `react-native-maps` (veya `expo-maps`) |
+| `recharts` | `victory-native` veya Skia tabanlı alternatif |
+| `vaul` (bottom sheet) | `@gorhom/bottom-sheet` |
+| `canvas-confetti` | `react-native-confetti-cannon` veya `lottie-react-native` |
+| `lucide-react` | `lucide-react-native` |
+| `vitest`, `@testing-library/react` | `jest-expo`, `@testing-library/react-native` |
+| — | `react-native-mmkv` |
+| — | `expo-font` |
+| — | `expo-image` |
+| — | `expo-av` / `expo-video` |
+| — | `expo-blur` |
+| — | `expo-crypto` |
+| — | `react-native-safe-area-context` |
+| — | `react-native-screens` |
+| — | `react-native-pager-view` |
+| — | `@groq-sdk/groq` (veya `fetch` ile direct) |
+
+---
+
+> **Faz 1 tamamlandı.** Onay sonrası Faz 2: kurulum + klasör iskeleti.

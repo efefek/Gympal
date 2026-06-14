@@ -10,8 +10,8 @@
 | Faz -1 | Eski projeyi `gympal-legacy` olarak rename | TAMAM |
 | Faz 0 | Legacy analizi → `MIGRATION_MAP.md` | TAMAM (onaylandı) |
 | Tasarım/Mimari | `DESIGN_SYSTEM.md` + `BUDDY_ARCHITECTURE.md` | TAMAM (kullanıcıya sunuldu) |
-| Faz 1 | Eşleştirme tablosu (web → native) | SIRADAKİ |
-| Faz 2 | Kurulum (NativeWind, MMKV, lucide-react-native, react-native-maps) + klasör iskeleti | bekliyor |
+| Faz 1 | Eşleştirme tablosu (web → native) | TAMAM (onaylandı) |
+| Faz 2 | Kurulum (NativeWind, MMKV, lucide-react-native, react-native-maps) + klasör iskeleti | TAMAM |
 | Faz 3 | Logic + navigasyon iskeleti (MMKV persistence, MuscleWiki cache) | bekliyor |
 | Faz 4 | UI'ı ekran ekran native+güçlü yeniden çiz (Reanimated 3 gesture) | bekliyor |
 
