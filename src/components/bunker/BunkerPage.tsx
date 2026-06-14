@@ -28,6 +28,8 @@ export function BunkerPage() {
   const snapRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    // SSR-safe: localStorage okuma yalnızca mount sonrası — kasıtlı set-state-in-effect.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true)
     setProfile(getProfile())
     setProgram(loadProgram())
@@ -47,7 +49,6 @@ export function BunkerPage() {
     sections[index]?.scrollIntoView({ behavior: 'smooth' })
   }, [])
 
-  const todayIdx = todayWeekIndex()
   const today = todayDayData(program ?? { name: '', description: '', daysPerWeek: 3, days: [] })
   const refDate = new Date()
   refDate.setDate(refDate.getDate() + weekOffset * 7)
@@ -68,7 +69,6 @@ export function BunkerPage() {
         mounted={mounted}
         program={program}
         weekDates={weekDates}
-        todayIdx={todayIdx}
         weekOffset={weekOffset}
         onPrevWeek={() => setWeekOffset((o) => o - 1)}
         onNextWeek={() => setWeekOffset((o) => o + 1)}
@@ -187,7 +187,6 @@ type CalendarSectionProps = {
   mounted: boolean
   program: WorkoutProgram | null
   weekDates: Date[]
-  todayIdx: number
   weekOffset: number
   onPrevWeek: () => void
   onNextWeek: () => void
@@ -195,7 +194,7 @@ type CalendarSectionProps = {
 }
 
 function CalendarSection({
-  mounted, program, weekDates, todayIdx, weekOffset, onPrevWeek, onNextWeek, onDayTap
+  mounted, program, weekDates, weekOffset, onPrevWeek, onNextWeek, onDayTap
 }: CalendarSectionProps) {
   const sectionRef = useRef<HTMLElement>(null)
   const daysPerWeek = program?.daysPerWeek ?? 3
