@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { router } from 'expo-router';
 import Animated, { FadeIn, FadeInUp } from 'react-native-reanimated';
-import { CircleUserRound, ChevronRight, Settings } from 'lucide-react-native';
+import { CircleUserRound, ChevronRight, Settings, SquarePen } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme-context';
 import { getProfile, goalLabels, experienceLabels } from '@/lib/profile';
 import { getLifetimeStats } from '@/lib/tracker';
@@ -86,18 +86,34 @@ export function ProfileRibbon() {
               <ChevronRight size={16} color={theme.inkText} />
             </Pressable>
 
-            <Pressable
-              onPress={() => {
-                setOpen(false);
-                router.push('/settings');
-              }}
-              className="flex-row items-center gap-2 mt-3 self-start"
-            >
-              <Settings size={14} color={theme.muted} />
-              <Text className="font-mono text-[10px] uppercase text-muted" style={{ letterSpacing: 1 }}>
-                Settings
-              </Text>
-            </Pressable>
+            <View className="flex-row items-center justify-between mt-3">
+              <Pressable
+                onPress={() => {
+                  setOpen(false);
+                  router.push('/profile/edit');
+                }}
+                className="flex-row items-center gap-2"
+                hitSlop={6}
+              >
+                <SquarePen size={14} color={theme.muted} />
+                <Text className="font-mono text-[10px] uppercase text-muted" style={{ letterSpacing: 1 }}>
+                  Edit
+                </Text>
+              </Pressable>
+              <Pressable
+                onPress={() => {
+                  setOpen(false);
+                  router.push('/settings');
+                }}
+                className="flex-row items-center gap-2"
+                hitSlop={6}
+              >
+                <Settings size={14} color={theme.muted} />
+                <Text className="font-mono text-[10px] uppercase text-muted" style={{ letterSpacing: 1 }}>
+                  Settings
+                </Text>
+              </Pressable>
+            </View>
           </Animated.View>
         </>
       )}
