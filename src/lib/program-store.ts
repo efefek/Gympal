@@ -1,7 +1,8 @@
 /* ─── Program Store ─────────────────────────────────────────
-   Custom program'ı localStorage'dan yükle/kaydet ve egzersiz
-   operasyonları. Bunker + program/page.tsx paylaşır (DRY). */
+   Custom program'ı MMKV'den yükle/kaydet ve egzersiz
+   operasyonları. Bunker + program ekranı paylaşır (DRY). */
 
+import { mmkv } from './storage'
 import type { WorkoutProgram, WorkoutExercise, WorkoutDay } from './workout'
 
 export const PROGRAM_KEY = 'gympal-program-custom'
@@ -9,9 +10,8 @@ export const PROGRAM_KEY = 'gympal-program-custom'
 /* ── Okuma ─────────────────────────────────────────────────── */
 
 export function loadProgram(): WorkoutProgram | null {
-  if (typeof window === 'undefined') return null
   try {
-    const raw = localStorage.getItem(PROGRAM_KEY)
+    const raw = mmkv.getString(PROGRAM_KEY)
     if (!raw) return null
     return JSON.parse(raw) as WorkoutProgram
   } catch {
@@ -22,7 +22,11 @@ export function loadProgram(): WorkoutProgram | null {
 /* ── Yazma ─────────────────────────────────────────────────── */
 
 export function saveProgram(program: WorkoutProgram): void {
-  localStorage.setItem(PROGRAM_KEY, JSON.stringify(program))
+  mmkv.set(PROGRAM_KEY, JSON.stringify(program))
+}
+
+export function clearProgram(): void {
+  mmkv.delete(PROGRAM_KEY)
 }
 
 /* ── Egzersiz operasyonları ─────────────────────────────────── */

@@ -1,39 +1,55 @@
-/**
- * Generic typed localStorage repository.
- * All operations are immutable and SSR-safe.
- * Future backend sync can be added behind this interface without touching consumers.
- */
+import { MMKV } from 'react-native-mmkv'
+import * as Crypto from 'expo-crypto'
+
+// Singleton MMKV instance — tüm gympal-* key'leri buraya yazar
+export const mmkv = new MMKV()
 
 export interface StoredItem {
   id: string
 }
 
 export function generateId(): string {
-  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
-    return crypto.randomUUID()
+  return Crypto.randomUUID()
+}
+
+// Tüm gympal-* key'lerini siler (Settings "clear all data")
+export function clearAllGympalData(): void {
+  const GYMPAL_KEYS = [
+    'gympal-profile',
+    'gympal-program-custom',
+    'gympal-weight-log',
+    'gympal-mood',
+    'gympal-checklist',
+    'gympal-todos',
+    'gympal-shopping',
+    'gympal-meals',
+    'gympal-measurements',
+    'gympal-vitals',
+    'gympal-buddy-key',
+    'gympal-buddy-model',
+    'theme',
+  ]
+  for (const key of GYMPAL_KEYS) {
+    mmkv.delete(key)
   }
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
 }
 
 function readKey<T>(key: string): T[] {
-  if (typeof window === 'undefined') return []
   try {
-    const raw = localStorage.getItem(key)
+    const raw = mmkv.getString(key)
     if (!raw) return []
     const parsed = JSON.parse(raw)
     return Array.isArray(parsed) ? (parsed as T[]) : []
-  } catch (error) {
-    console.error(`storage: failed to read "${key}"`, error)
+  } catch {
     return []
   }
 }
 
 function writeKey<T>(key: string, items: T[]): void {
-  if (typeof window === 'undefined') return
   try {
-    localStorage.setItem(key, JSON.stringify(items))
-  } catch (error) {
-    console.error(`storage: failed to write "${key}"`, error)
+    mmkv.set(key, JSON.stringify(items))
+  } catch {
+    // depolama hatası — sessizce geç
   }
 }
 
@@ -62,7 +78,7 @@ export function createStore<T extends StoredItem>(key: string): Store<T> {
     },
     update(id, patch) {
       const next = readKey<T>(key).map((item) =>
-        item.id === id ? { ...item, ...patch } : item
+        item.id === id ? { ...item, ...patch } : item,
       )
       writeKey(key, next)
       return next
@@ -73,8 +89,7 @@ export function createStore<T extends StoredItem>(key: string): Store<T> {
       return next
     },
     clear() {
-      if (typeof window === 'undefined') return
-      localStorage.removeItem(key)
+      mmkv.delete(key)
     },
   }
 }
