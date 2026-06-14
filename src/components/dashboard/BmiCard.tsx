@@ -38,7 +38,7 @@ export default function BmiCard({ height, weight }: BmiCardProps) {
   const dashOffset = CIRC * (1 - ratio)
 
   return (
-    <div className="border-[3px] p-4" style={{ background: 'var(--surface-1)', borderColor: 'var(--foreground)' }}>
+    <div className="surface-region p-4">
       <span className="font-mono text-xs font-bold uppercase tracking-[0.18em]" style={{ color: 'var(--muted)' }}>{t.dashboard.bmi.title}</span>
 
       <div className="flex flex-col items-center mt-2">
