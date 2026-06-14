@@ -13,8 +13,8 @@ export const palette = {
   seriesAmber: '#c9a471',
   seriesViolet: '#a471c9',
 
-  // Tek vurgu
-  accent: '#c99700',
+  // Tek vurgu — açık altın sarı (siyah typo üstünde net okunur)
+  accent: '#ffcb2d',
 } as const;
 
 export interface Theme {
