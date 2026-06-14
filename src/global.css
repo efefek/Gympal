@@ -1,9 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
-  --font-display:
-    Spline Sans, Inter, ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji,
-    Segoe UI Symbol, Noto Color Emoji;
-  --font-mono:
-    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
-  --font-rounded: 'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif;
-  --font-serif: Georgia, 'Times New Roman', serif;
+  /* Varsayılan: siyah zemin + beyaz metin */
+  --bg: #0a0a0b;
+  --fg: #f4f4f5;
+
+  /* Türetilen yüzeyler */
+  --surface-1: #141416;
+  --surface-2: #1c1c1f;
+  --surface-3: #242428;
+  --border: #26262a;
+  --muted: #8a8a90;
+  --ink: #f4f4f5;
+  --ink-text: #0a0a0b;
+
+  /* Tek vurgu (today-dot, streak, focus ring) */
+  --accent: #c99700;
 }
