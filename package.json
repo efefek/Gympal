@@ -3,6 +3,8 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "dependencies": {
+    "@expo-google-fonts/geist": "^0.4.2",
+    "@expo-google-fonts/geist-mono": "^0.4.2",
     "@expo/ui": "~56.0.17",
     "@gorhom/bottom-sheet": "^5.2.14",
     "expo": "~56.0.11",

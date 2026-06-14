@@ -13,7 +13,13 @@
 | Faz 1 | Eşleştirme tablosu (web → native) | TAMAM (onaylandı) |
 | Faz 2 | Kurulum (NativeWind, MMKV, lucide-react-native, react-native-maps) + klasör iskeleti | TAMAM |
 | Faz 3 | Logic + navigasyon iskeleti (MMKV persistence, MuscleWiki cache) | TAMAM |
-| Faz 4 | UI'ı ekran ekran native+güçlü yeniden çiz (Reanimated 3 gesture) | bekliyor |
+| Faz 4 | UI'ı ekran ekran native+güçlü yeniden çiz (Reanimated 3 gesture) | DEVAM EDİYOR |
+| ↳ 4.0 | Altyapı: tema sistemi (deriveTheme, ThemeProvider+MMKV), Geist fontları | TAMAM |
+| ↳ 4.1 | Bunker ekranı (PanelPager gesture, dashboard + program paneli) | TAMAM |
+| ↳ 4.2 | Vitals ekranı | bekliyor |
+| ↳ 4.3 | Buddy ekranı (Groq + tool calling UI) | bekliyor |
+| ↳ 4.4 | Social ekranı (yatay pager) | bekliyor |
+| ↳ 4.5 | Stack ekranlar: profile, edit, program, exercises, settings | bekliyor |
 
 ## 2026-06-14 Session Özeti (Opus)
 
