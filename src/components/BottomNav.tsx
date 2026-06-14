@@ -6,7 +6,7 @@ import { Home, Activity, Users, User, Sparkles } from 'lucide-react'
 import { motion } from 'motion/react'
 
 const tabs = [
-  { href: '/', label: 'Home', icon: Home },
+  { href: '/', label: 'Bunker', icon: Home },
   { href: '/body', label: 'Body', icon: Activity },
   { href: '/social', label: 'Social', icon: Users },
   { href: '/profile', label: 'Profile', icon: User },

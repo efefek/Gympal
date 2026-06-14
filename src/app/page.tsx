@@ -1,6 +1,5 @@
-import Hero from "@/components/Hero";
+import { BunkerPage } from '@/components/bunker/BunkerPage'
 
 export default function Home() {
-  return <Hero />;
+  return <BunkerPage />
 }
-
