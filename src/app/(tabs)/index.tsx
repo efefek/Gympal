@@ -5,6 +5,8 @@ import { router, useFocusEffect } from 'expo-router';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   useAnimatedStyle,
+  useSharedValue,
+  useAnimatedScrollHandler,
   interpolate,
   Extrapolation,
   type SharedValue,
@@ -66,23 +68,29 @@ export default function BunkerScreen() {
   );
 }
 
-/* Parallax katmanı: panel geçişinde her blok farklı hızda kayar.
-   factor büyüdükçe katman daha hızlı (daha derinde) hissedilir. */
+/* Parallax katmanı: hem panel geçişinde hem scroll'da her blok farklı
+   hızda kayar. factor = panel-geçiş derinliği; scrollFactor = scroll
+   parallax (üst katman daha çok geride kalır → derinlik hissi). */
 function ParallaxLayer({
   progress,
   panelIndex,
   factor,
+  scrollY,
+  scrollFactor = 0,
   children,
 }: {
   progress: SharedValue<number>;
   panelIndex: number;
   factor: number;
+  scrollY?: SharedValue<number>;
+  scrollFactor?: number;
   children: ReactNode;
 }) {
   const style = useAnimatedStyle(() => {
     const rel = progress.value - panelIndex;
-    const translateY = interpolate(rel, [-1, 0, 1], [factor, 0, -factor], Extrapolation.CLAMP);
-    return { transform: [{ translateY }] };
+    const panelY = interpolate(rel, [-1, 0, 1], [factor, 0, -factor], Extrapolation.CLAMP);
+    const scroll = scrollY ? scrollY.value * scrollFactor : 0;
+    return { transform: [{ translateY: panelY + scroll }] };
   });
   return <Animated.View style={style}>{children}</Animated.View>;
 }
@@ -101,6 +109,11 @@ function DashboardPanel({ data, api }: { data: BunkerData; api: PagerApi }) {
   const weekDates = getWeekDates(refDate);
   const today = todayDayData(program ?? { name: '', description: '', daysPerWeek: 3, days: [] });
 
+  const scrollY = useSharedValue(0);
+  const onScroll = useAnimatedScrollHandler((e) => {
+    scrollY.value = e.contentOffset.y;
+  });
+
   const weekPan = Gesture.Pan()
     .activeOffsetX([-15, 15])
     .failOffsetY([-15, 15])
@@ -110,12 +123,14 @@ function DashboardPanel({ data, api }: { data: BunkerData; api: PagerApi }) {
     });
 
   return (
-    <ScrollView
+    <Animated.ScrollView
+      onScroll={onScroll}
+      scrollEventThrottle={16}
       contentContainerStyle={{ paddingHorizontal: 24, paddingTop: insets.top + 64, paddingBottom: 110 }}
       showsVerticalScrollIndicator={false}
     >
-      {/* Hero — bauhaus dev başlık (parallax: yavaş) */}
-      <ParallaxLayer progress={api.progress} panelIndex={0} factor={18}>
+      {/* Hero — bauhaus dev başlık (parallax: en yavaş, scroll'da geride kalır) */}
+      <ParallaxLayer progress={api.progress} panelIndex={0} factor={18} scrollY={scrollY} scrollFactor={0.35}>
         <Text className="font-mono text-[11px] uppercase text-muted mb-3" style={{ letterSpacing: 3 }}>
           Bunker
         </Text>
@@ -134,7 +149,7 @@ function DashboardPanel({ data, api }: { data: BunkerData; api: PagerApi }) {
 
       {/* Stats (parallax: orta) */}
       {profile && (
-        <ParallaxLayer progress={api.progress} panelIndex={0} factor={45}>
+        <ParallaxLayer progress={api.progress} panelIndex={0} factor={45} scrollY={scrollY} scrollFactor={0.18}>
           <RevealBlock delay={320}>
             <View className="mt-8 flex-row gap-8">
               <StatItem value={currentWeightKg > 0 ? `${currentWeightKg}` : '—'} unit="kg" label="Weight" dot={SERIES[1]} />
@@ -146,7 +161,7 @@ function DashboardPanel({ data, api }: { data: BunkerData; api: PagerApi }) {
       )}
 
       {/* Calendar (parallax: hızlı) */}
-      <ParallaxLayer progress={api.progress} panelIndex={0} factor={75}>
+      <ParallaxLayer progress={api.progress} panelIndex={0} factor={75} scrollY={scrollY} scrollFactor={0.06}>
         <RevealBlock delay={profile ? 380 : 300}>
           <View className="mt-9">
             <View className="flex-row items-center justify-between mb-4">
@@ -247,7 +262,7 @@ function DashboardPanel({ data, api }: { data: BunkerData; api: PagerApi }) {
           </Pressable>
         </RevealBlock>
       </ParallaxLayer>
-    </ScrollView>
+    </Animated.ScrollView>
   );
 }
 

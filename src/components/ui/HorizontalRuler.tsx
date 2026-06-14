@@ -15,12 +15,19 @@ interface Props {
   step?: number;
   unit: string;
   onChange: (v: number) => void;
+  /** Kompakt mod: küçük sayı + kısa tick'ler (Diet adımı intake için). */
+  compact?: boolean;
 }
 
-export function HorizontalRuler({ value, min, max, step = 1, unit, onChange }: Props) {
+export function HorizontalRuler({ value, min, max, step = 1, unit, onChange, compact = false }: Props) {
   const { theme } = useTheme();
   const { width } = useWindowDimensions();
   const sidePad = width / 2 - 12;
+  const valueSize = compact ? 30 : 56;
+  const indicatorH = compact ? 28 : 44;
+  const hMajor = compact ? 22 : 36;
+  const hMid = compact ? 15 : 24;
+  const hMin = compact ? 9 : 14;
 
   const valueToOffset = (v: number) => ((v - min) / step) * TICK_W;
   // İlk scroll pozisyonu yalnız mount'ta — value değişince RESETLENMEZ (bug fix)
@@ -43,10 +50,10 @@ export function HorizontalRuler({ value, min, max, step = 1, unit, onChange }: P
     <View>
       {/* Büyük değer */}
       <View className="flex-row items-end justify-center mb-3">
-        <Text style={{ fontFamily: Fonts.display, color: theme.fg, fontSize: 56, letterSpacing: -2 }}>
+        <Text style={{ fontFamily: Fonts.display, color: theme.fg, fontSize: valueSize, letterSpacing: -2 }}>
           {value}
         </Text>
-        <Text className="font-mono text-base text-muted mb-3 ml-1.5">{unit}</Text>
+        <Text className="font-mono text-sm text-muted mb-2 ml-1.5">{unit}</Text>
       </View>
 
       <View>
@@ -69,7 +76,7 @@ export function HorizontalRuler({ value, min, max, step = 1, unit, onChange }: P
                 <View
                   style={{
                     width: 1.5,
-                    height: major ? 36 : mid ? 24 : 14,
+                    height: major ? hMajor : mid ? hMid : hMin,
                     backgroundColor: major ? theme.fg : theme.muted,
                     opacity: major ? 0.9 : 0.4,
                     borderRadius: 1,
@@ -88,7 +95,7 @@ export function HorizontalRuler({ value, min, max, step = 1, unit, onChange }: P
         {/* Ortadaki sabit gösterge */}
         <View
           pointerEvents="none"
-          style={{ position: 'absolute', top: 0, left: '50%', marginLeft: -1.5, width: 3, height: 44, backgroundColor: theme.accent, borderRadius: 2 }}
+          style={{ position: 'absolute', top: 0, left: '50%', marginLeft: -1.5, width: 3, height: indicatorH, backgroundColor: theme.accent, borderRadius: 2 }}
         />
       </View>
     </View>

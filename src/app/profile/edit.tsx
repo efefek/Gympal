@@ -184,19 +184,46 @@ function BodyStep({ p, patch }: { p: UserProfile; patch: (n: Partial<UserProfile
 /* ─── Adım 2 — Goal ───────────────────────────────────────── */
 
 function GoalStep({ p, patch }: { p: UserProfile; patch: (n: Partial<UserProfile>) => void }) {
+  const { theme } = useTheme();
   return (
     <View>
       <StepHeading kicker="Step 2" title={'Your\ngoal'} />
       <SectionLabel>What do you want?</SectionLabel>
-      <View className="flex-row flex-wrap gap-2">
-        {GOALS.map((g) => (
-          <Chip key={g} label={goalLabels[g]} active={p.goal === g} onPress={() => patch({ goal: g })} />
-        ))}
+      <View className="gap-2.5">
+        {GOALS.map((g, i) => {
+          const active = p.goal === g;
+          return (
+            <Pressable
+              key={g}
+              onPress={() => patch({ goal: g })}
+              style={({ pressed }) => ({
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 14,
+                borderRadius: 18,
+                paddingHorizontal: 18,
+                paddingVertical: 18,
+                backgroundColor: active ? theme.accent : theme.surface1,
+                borderWidth: 1.5,
+                borderColor: active ? theme.accent : theme.border,
+                transform: [{ scale: pressed ? 0.985 : 1 }],
+              })}
+            >
+              <Text className="font-mono text-xs font-bold" style={{ color: active ? '#0a0a0b' : theme.muted, opacity: active ? 0.6 : 1 }}>
+                0{i + 1}
+              </Text>
+              <Text className="font-display text-xl flex-1" style={{ color: active ? '#0a0a0b' : theme.fg, letterSpacing: -0.5 }}>
+                {goalLabels[g]}
+              </Text>
+            </Pressable>
+          );
+        })}
       </View>
+
       <SectionLabel>Experience</SectionLabel>
-      <View className="flex-row flex-wrap gap-2">
+      <View className="flex-row gap-2">
         {EXPERIENCES.map((e) => (
-          <Chip key={e} label={experienceLabels[e]} active={p.experience === e} onPress={() => patch({ experience: e })} />
+          <Chip key={e} label={experienceLabels[e]} active={p.experience === e} onPress={() => patch({ experience: e })} grow />
         ))}
       </View>
     </View>
@@ -254,13 +281,6 @@ function SetupStep({ p, patch }: { p: UserProfile; patch: (n: Partial<UserProfil
           </>
         )}
       </Animated.View>
-
-      <SectionLabel>Daily targets</SectionLabel>
-      <Text className="font-mono text-[10px] uppercase text-muted mb-2 text-center" style={{ letterSpacing: 2 }}>Water</Text>
-      <HorizontalRuler value={p.dailyWaterMlTarget ?? 2500} min={1000} max={5000} step={100} unit="ml" onChange={(v) => patch({ dailyWaterMlTarget: v })} />
-      <View className="h-6" />
-      <Text className="font-mono text-[10px] uppercase text-muted mb-2 text-center" style={{ letterSpacing: 2 }}>Protein</Text>
-      <HorizontalRuler value={p.dailyProteinGTarget ?? 150} min={40} max={300} step={5} unit="g" onChange={(v) => patch({ dailyProteinGTarget: v })} />
     </View>
   );
 }
@@ -298,6 +318,15 @@ function DietStep({ p, patch }: { p: UserProfile; patch: (n: Partial<UserProfile
         className="rounded-2xl px-4 py-3 text-base"
         style={{ backgroundColor: theme.surface1, borderWidth: 1.5, borderColor: theme.border, color: theme.fg, fontFamily: Fonts.sans }}
       />
+
+      <SectionLabel>Daily intake targets</SectionLabel>
+      <View className="rounded-2xl p-4" style={{ backgroundColor: theme.surface1, borderWidth: 1.5, borderColor: theme.border }}>
+        <Text className="font-mono text-[9px] uppercase text-muted mb-1 text-center" style={{ letterSpacing: 1.5 }}>Water</Text>
+        <HorizontalRuler compact value={p.dailyWaterMlTarget ?? 2500} min={1000} max={5000} step={100} unit="ml" onChange={(v) => patch({ dailyWaterMlTarget: v })} />
+        <View className="h-3" />
+        <Text className="font-mono text-[9px] uppercase text-muted mb-1 text-center" style={{ letterSpacing: 1.5 }}>Protein</Text>
+        <HorizontalRuler compact value={p.dailyProteinGTarget ?? 150} min={40} max={300} step={5} unit="g" onChange={(v) => patch({ dailyProteinGTarget: v })} />
+      </View>
     </View>
   );
 }
