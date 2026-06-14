@@ -11,20 +11,24 @@ export default function SocialPage() {
   return (
     <div className="mx-auto w-full max-w-lg flex-1 px-5 pt-6 pb-28 md:max-w-2xl">
       <header className="mb-6">
-        <h1 className="text-2xl font-bold tracking-tight">Social & Community</h1>
-        <p className="text-xs text-zinc-500 mt-1">Connect, share, and celebrate achievements</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] mb-1" style={{ color: 'var(--muted)' }}>
+          Community
+        </p>
+        <h1 className="text-4xl font-bold tracking-tight leading-none">Social</h1>
       </header>
 
-      <div className="flex border-b border-zinc-800 mb-6 gap-4">
+      <div className="flex mb-6 gap-1" style={{ borderBottom: '1px solid var(--card-border)' }}>
         {(['feed', 'discover', 'events'] as const).map((tab) => (
           <button
             key={tab}
+            type="button"
             onClick={() => setActiveTab(tab)}
-            className={`pb-3 px-1 text-sm font-medium transition-colors border-b-2 ${
+            className="pb-3 px-3 text-sm font-medium transition-colors border-b-2"
+            style={
               activeTab === tab
-                ? 'border-primary text-primary'
-                : 'border-transparent text-zinc-400 hover:text-zinc-200'
-            }`}
+                ? { borderColor: 'var(--foreground)', color: 'var(--foreground)' }
+                : { borderColor: 'transparent', color: 'var(--muted)' }
+            }
           >
             {tab.charAt(0).toUpperCase() + tab.slice(1)}
           </button>
@@ -41,8 +45,11 @@ export default function SocialPage() {
 
       {activeTab === 'discover' && (
         <div className="space-y-4">
-          <div className="rounded-2xl border border-zinc-800 bg-surface-1 p-4 h-64 flex items-center justify-center">
-            <p className="text-sm text-zinc-400">Map view coming soon</p>
+          <div
+            className="rounded-2xl p-4 h-64 flex items-center justify-center"
+            style={{ background: 'var(--surface-1)', border: '1.5px solid var(--card-border)' }}
+          >
+            <p className="text-sm" style={{ color: 'var(--muted)' }}>Map view coming soon</p>
           </div>
           <div className="space-y-3">
             <h3 className="font-semibold text-sm">Nearby Events</h3>
