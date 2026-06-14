@@ -40,6 +40,10 @@
     --radius-card: var(--r-outer);
     --radius-pill: 9999px;
 
+    /* Tek Swiss yüzey dili — tüm ekranlarda aynı bölge/kart/input radius'u */
+    --r-region: 0.5rem;
+    --r-field: 0.375rem;
+
     --text-primary: var(--foreground);
     --text-muted: var(--muted);
     --border: var(--card-border);
@@ -99,22 +103,32 @@
   -webkit-backdrop-filter: blur(14px);
 }
 
+/* Tek Swiss yüzey — bölge/kart. Tüm ekranlar (Home, Dashboard, Body) bunu kullanır.
+   Brutalist 3px foreground çerçeve yerine tutarlı 1.5px border + ortak radius. */
+.surface-region {
+  background: var(--surface-1);
+  border: 1.5px solid var(--card-border);
+  border-radius: var(--r-region);
+}
+
+/* Geriye-uyum: eski .dashboard-region artık tek dile alias */
 .dashboard-region {
   background: var(--surface-1);
-  border: 3px solid var(--foreground);
-  border-radius: 0;
+  border: 1.5px solid var(--card-border);
+  border-radius: var(--r-region);
 }
 
 .dashboard-region + .dashboard-region {
   margin-top: 1rem;
 }
 
+/* Tek input dili — light=beyaz, dark=koyu gri; ok/spinner yok (NumberScrubber kullanılır) */
 .ui-field {
   width: 100%;
-  border: 1px solid var(--card-border);
+  border: 1.5px solid var(--card-border);
   background: var(--surface-2);
   color: var(--foreground);
-  border-radius: 0.75rem;
+  border-radius: var(--r-field);
   padding: 0.625rem 0.75rem;
   font-size: 0.875rem;
   line-height: 1.25rem;
@@ -124,6 +138,17 @@
 [data-theme="light"] .ui-field {
   background: #ffffff;
   color: #16161a;
+}
+
+/* Native number spinner ok'larını gizle — kontrollü giriş kullanıyoruz */
+.no-spinner::-webkit-outer-spin-button,
+.no-spinner::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.no-spinner {
+  -moz-appearance: textfield;
+  appearance: textfield;
 }
 
 .ui-field::placeholder {
