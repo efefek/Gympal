@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, type ReactNode } from 'react'
+import { type ReactNode } from 'react'
 import { useScroll, useTransform, useReducedMotion, motion } from 'motion/react'
 
 /* ─── SnapPager ─────────────────────────────────────────────
