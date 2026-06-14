@@ -5,8 +5,6 @@ import { router, useFocusEffect } from 'expo-router';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   useAnimatedStyle,
-  useSharedValue,
-  useAnimatedScrollHandler,
   interpolate,
   Extrapolation,
   type SharedValue,
@@ -109,11 +107,6 @@ function DashboardPanel({ data, api }: { data: BunkerData; api: PagerApi }) {
   const weekDates = getWeekDates(refDate);
   const today = todayDayData(program ?? { name: '', description: '', daysPerWeek: 3, days: [] });
 
-  const scrollY = useSharedValue(0);
-  const onScroll = useAnimatedScrollHandler((e) => {
-    scrollY.value = e.contentOffset.y;
-  });
-
   const weekPan = Gesture.Pan()
     .activeOffsetX([-15, 15])
     .failOffsetY([-15, 15])
@@ -123,14 +116,12 @@ function DashboardPanel({ data, api }: { data: BunkerData; api: PagerApi }) {
     });
 
   return (
-    <Animated.ScrollView
-      onScroll={onScroll}
-      scrollEventThrottle={16}
+    <ScrollView
       contentContainerStyle={{ paddingHorizontal: 24, paddingTop: insets.top + 64, paddingBottom: 110 }}
       showsVerticalScrollIndicator={false}
     >
-      {/* Hero — bauhaus dev başlık (parallax: en yavaş, scroll'da geride kalır) */}
-      <ParallaxLayer progress={api.progress} panelIndex={0} factor={18} scrollY={scrollY} scrollFactor={0.35}>
+      {/* Hero — bauhaus dev başlık (panel-geçiş parallax: yavaş) */}
+      <ParallaxLayer progress={api.progress} panelIndex={0} factor={18}>
         <Text className="font-mono text-[11px] uppercase text-muted mb-3" style={{ letterSpacing: 3 }}>
           Bunker
         </Text>
@@ -149,7 +140,7 @@ function DashboardPanel({ data, api }: { data: BunkerData; api: PagerApi }) {
 
       {/* Stats (parallax: orta) */}
       {profile && (
-        <ParallaxLayer progress={api.progress} panelIndex={0} factor={45} scrollY={scrollY} scrollFactor={0.18}>
+        <ParallaxLayer progress={api.progress} panelIndex={0} factor={45}>
           <RevealBlock delay={320}>
             <View className="mt-8 flex-row gap-8">
               <StatItem value={currentWeightKg > 0 ? `${currentWeightKg}` : '—'} unit="kg" label="Weight" dot={SERIES[1]} />
@@ -161,7 +152,7 @@ function DashboardPanel({ data, api }: { data: BunkerData; api: PagerApi }) {
       )}
 
       {/* Calendar (parallax: hızlı) */}
-      <ParallaxLayer progress={api.progress} panelIndex={0} factor={75} scrollY={scrollY} scrollFactor={0.06}>
+      <ParallaxLayer progress={api.progress} panelIndex={0} factor={75}>
         <RevealBlock delay={profile ? 380 : 300}>
           <View className="mt-9">
             <View className="flex-row items-center justify-between mb-4">
@@ -262,7 +253,7 @@ function DashboardPanel({ data, api }: { data: BunkerData; api: PagerApi }) {
           </Pressable>
         </RevealBlock>
       </ParallaxLayer>
-    </Animated.ScrollView>
+    </ScrollView>
   );
 }
 
