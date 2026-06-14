@@ -32,6 +32,8 @@ export interface UserProfile {
   dailyProteinGTarget?: number
 }
 
+import { mmkv } from './storage'
+
 const STORAGE_KEY = 'gympal-profile'
 
 const DEFAULT_NUTRITION = {
@@ -43,8 +45,7 @@ const DEFAULT_NUTRITION = {
 }
 
 export function getProfile(): UserProfile | null {
-  if (typeof window === 'undefined') return null
-  const raw = localStorage.getItem(STORAGE_KEY)
+  const raw = mmkv.getString(STORAGE_KEY)
   if (!raw) return null
   try {
     return { ...DEFAULT_NUTRITION, ...(JSON.parse(raw) as UserProfile) }
@@ -53,12 +54,12 @@ export function getProfile(): UserProfile | null {
   }
 }
 
-export function saveProfile(profile: UserProfile) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(profile))
+export function saveProfile(profile: UserProfile): void {
+  mmkv.set(STORAGE_KEY, JSON.stringify(profile))
 }
 
-export function clearProfile() {
-  localStorage.removeItem(STORAGE_KEY)
+export function clearProfile(): void {
+  mmkv.delete(STORAGE_KEY)
 }
 
 export const goalLabels: Record<Goal, string> = {
