@@ -34,6 +34,13 @@
     --primary-mid: rgba(201, 151, 0, 0.22);
     --primary-glow: none;
 
+    /* Pastel veri serisi token'ları — grafik/gruplama renkleri (marka değil) */
+    --series-red: oklch(65% 0.09 20);
+    --series-blue: oklch(65% 0.09 240);
+    --series-green: oklch(65% 0.09 145);
+    --series-amber: oklch(70% 0.10 75);
+    --series-violet: oklch(65% 0.09 290);
+
     /* Radius token'ları — concentric */
     --r-outer: 1.5rem;
     --r-inner: 1rem;
@@ -65,6 +72,13 @@
     --ink-text: #fafaf8;
 
     --primary-dim: rgba(20, 20, 20, 0.06);
+
+    /* Light'ta pastel seriler biraz daha doygun (okunur kalsın) */
+    --series-red: oklch(58% 0.11 20);
+    --series-blue: oklch(58% 0.11 240);
+    --series-green: oklch(58% 0.11 145);
+    --series-amber: oklch(62% 0.12 75);
+    --series-violet: oklch(58% 0.11 290);
   }
 }
 
