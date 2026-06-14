@@ -189,6 +189,9 @@ Basit **aktivite bazlı eşleşme**. **Cinsiyetsiz, sadece aktivite**:
 > Kullanıcının 17 referans + yorumundan çıkarılan bağlayıcı görsel dil. Her ekran buna uyacak.
 > Renkler referanslardan ALINMAZ (bizim tek-renk tema), sadece **dizilim, tipografi, kart kurgusu, grafik dili** alınır.
 
+### 11.0 Bunker Hero — "Live Tile" (ileride)
+Hero başlık statik değil, **dönen canlı mesajlar** olacak (live tile): "Good evening" → "Hi Efe" → "It's raining" → "Don't forget your workout" → "Welcome back Efe" → ... Saate/havaya/duruma göre değişen, belirli aralıkla geçiş yapan mesaj akışı. Şimdilik saat bazlı tek greeting; sonra rotasyon + bağlam (hava, plan, streak) eklenecek. RevealText geçiş animasyonu kullanılır.
+
 ### 11.1 Tipografi (en kritik)
 - **Bauhaus / brutalist bold display.** Dev, `font-display` (Geist Black), sol-hizalı, satır satır kırılan başlıklar (ref: "Mood / diary", "Statistics", "Track. Understand. Thrive.").
 - Başlık = tasarımın kendisi. Hero başlık ekranın üst üçte birini kaplar, çok büyük (48–72px), tracking-tighter.
