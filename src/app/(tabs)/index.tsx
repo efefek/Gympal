@@ -1,5 +1,5 @@
 import { useCallback, useState, type ReactNode } from 'react';
-import { View, Text, Pressable, ScrollView } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router, useFocusEffect } from 'expo-router';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -9,7 +9,7 @@ import Animated, {
   Extrapolation,
   type SharedValue,
 } from 'react-native-reanimated';
-import { Play, Plus, ChevronUp } from 'lucide-react-native';
+import { Play, Plus, ChevronUp, ChevronDown } from 'lucide-react-native';
 
 import { PanelPager, type PagerApi } from '@/components/bunker/PanelPager';
 import { ScreenChrome } from '@/components/chrome/ScreenChrome';
@@ -116,10 +116,7 @@ function DashboardPanel({ data, api }: { data: BunkerData; api: PagerApi }) {
     });
 
   return (
-    <ScrollView
-      contentContainerStyle={{ paddingHorizontal: 24, paddingTop: insets.top + 64, paddingBottom: 110 }}
-      showsVerticalScrollIndicator={false}
-    >
+    <View style={{ flex: 1, paddingHorizontal: 24, paddingTop: insets.top + 64, paddingBottom: 24 }}>
       {/* Hero — bauhaus dev başlık (panel-geçiş parallax: yavaş) */}
       <ParallaxLayer progress={api.progress} panelIndex={0} factor={18}>
         <Text className="font-mono text-[11px] uppercase text-muted mb-3" style={{ letterSpacing: 3 }}>
@@ -245,15 +242,15 @@ function DashboardPanel({ data, api }: { data: BunkerData; api: PagerApi }) {
             )}
           </View>
 
-          <Pressable onPress={() => api.paginate(1)} className="mt-10 items-center gap-1">
-            <ChevronUp size={20} color={theme.muted} />
+          <Pressable onPress={() => api.paginate(1)} className="mt-8 items-center gap-1">
             <Text className="font-mono text-[10px] uppercase text-muted" style={{ letterSpacing: 3 }}>
               Program
             </Text>
+            <ChevronDown size={20} color={theme.muted} />
           </Pressable>
         </RevealBlock>
       </ParallaxLayer>
-    </ScrollView>
+    </View>
   );
 }
 
@@ -281,10 +278,7 @@ function ProgramPanel({ program, api }: { program: WorkoutProgram | null; api: P
   const todayIdx = program ? todayWeekIndex() % program.daysPerWeek : -1;
 
   return (
-    <ScrollView
-      contentContainerStyle={{ paddingHorizontal: 24, paddingTop: insets.top + 64, paddingBottom: 110 }}
-      showsVerticalScrollIndicator={false}
-    >
+    <View style={{ flex: 1, paddingHorizontal: 24, paddingTop: insets.top + 64, paddingBottom: 24 }}>
       <ParallaxLayer progress={api.progress} panelIndex={1} factor={20}>
         <Pressable onPress={() => api.paginate(-1)} className="flex-row items-center gap-2 self-start mb-7">
           <ChevronUp size={16} color={theme.muted} />
@@ -367,6 +361,6 @@ function ProgramPanel({ program, api }: { program: WorkoutProgram | null; api: P
           </Pressable>
         </ParallaxLayer>
       )}
-    </ScrollView>
+    </View>
   );
 }
